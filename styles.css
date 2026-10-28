@@ -1169,7 +1169,7 @@ tbody tr.ours {
 }
 pre {
   white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   padding: 5px 22px 23px;
   margin: 0;
   font-family: ui-monospace, SFMono-Regular, Consolas, monospace;

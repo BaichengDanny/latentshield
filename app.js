@@ -545,13 +545,8 @@ document.querySelector("#topology-table").innerHTML =
     )}<tr class="ours"><th scope="row">Average</th><td>0.180</td><td>0.098</td></tr></tbody>`;
 
 const citation = `@misc{chen2026latentshield,
-  title = {LatentShield: Composable Latent Multi-Agent
-           Systems with Decision-Boundary Monitoring},
-  author = {Chen, Baicheng and Satheesh, Anirudh and
-            Yuan, Lingzhi and Gjerstad, Drew and
-            Mendez, Andrew and Gnanaraj, Ami Britti Antoni and
-            Kang, Mingyu and Leinwand, Benjamin and
-            Schoen, Andrew Adams and Huang, Furong},
+  title = {LatentShield: Composable Latent Multi-Agent Systems with Decision-Boundary Monitoring},
+  author = {Chen, Baicheng and Satheesh, Anirudh and Yuan, Lingzhi and Gjerstad, Drew and Mendez, Andrew and Gnanaraj, Ami Britti Antoni and Kang, Mingyu and Leinwand, Benjamin and Schoen, Andrew Adams and Huang, Furong},
   year = {2026},
   note = {Preprint}
 }`;
