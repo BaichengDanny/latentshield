@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="LatentShield: Composable Latent Multi-Agent Systems with Decision-Boundary Monitoring. A safety interface for latent multi-agent collaboration."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta
+      property="og:title"
+      content="LatentShield — Safety at the decision boundary"
+    />
+    <meta
+      property="og:description"
+      content="Composable latent multi-agent systems with decision-boundary monitoring."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://baichengdanny.github.io/latentshield/assets/teaser.png"
+    />
+    <meta
+      property="og:url"
+      content="https://baichengdanny.github.io/latentshield/"
+    />
+    <link
+      rel="canonical"
+      href="https://baichengdanny.github.io/latentshield/"
+    />
+    <title>LatentShield — Decision-Boundary Monitoring</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link
+      rel="preload"
+      href="assets/fonts/NotoSans-Variable-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="assets/fonts/Lato-700-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#overview">Skip to content</a>
+    <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+          <path
+            d="M12 2 3.5 5.5v6c0 5 3.6 8.5 8.5 11 4.9-2.5 8.5-6 8.5-11v-6Z"
+          />
+          <path d="m8 12 2.5 2.5 5.5-6" />
+        </symbol>
+        <symbol id="i-paper" viewBox="0 0 24 24">
+          <path d="M14 2H5v20h14V7Z M14 2v6h5 M8 12h8 M8 16h8" />
+        </symbol>
+        <symbol id="i-code" viewBox="0 0 24 24">
+          <path d="m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18" />
+        </symbol>
+        <symbol id="i-box" viewBox="0 0 24 24">
+          <path
+            d="m12 2 9 5v10l-9 5-9-5V7Zm0 10 9-5M12 12 3 7m9 5v10M7 4.8l9 5"
+          />
+        </symbol>
+        <symbol id="i-data" viewBox="0 0 24 24">
+          <ellipse cx="12" cy="5" rx="9" ry="3" />
+          <path d="M3 5v14c0 4 18 4 18 0V5M3 12c0 4 18 4 18 0" />
+        </symbol>
+        <symbol id="i-play" viewBox="0 0 24 24">
+          <path d="m9 5 11 7-11 7Z" />
+        </symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+          <path d="M5 12h14m-6-6 6 6-6 6" />
+        </symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24">
+          <rect x="8" y="8" width="13" height="13" rx="2" />
+          <path d="M16 8V3H3v13h5" />
+        </symbol>
+      </defs>
+    </svg>
+    <header class="site-header">
+      <nav aria-label="Main navigation">
+        <a href="#top">Overview</a><a href="#overview">How it works</a
+        ><a href="#method">Method</a><a href="#results">Results</a
+        ><a href="#generalization">Generalization</a
+        ><a href="#citation">BibTeX</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero container" id="top">
+        <h1>
+          <img
+            class="hero-mark"
+            src="assets/favicon.svg"
+            alt=""
+            width="64"
+            height="64"
+          /><span class="title-wordmark"
+            >Latent<span class="title-accent">Shield</span></span
+          >
+        </h1>
+        <h2>
+          Composable Latent Multi-Agent Systems<br class="desktop-break" />
+          with Decision-Boundary Monitoring
+        </h2>
+        <div class="authors" aria-label="Authors">
+          <span>Baicheng Chen<sup>1,*</sup></span
+          ><span>Anirudh Satheesh<sup>1,*</sup></span
+          ><span>Lingzhi Yuan<sup>1</sup></span
+          ><span>Drew Gjerstad<sup>1</sup></span
+          ><span>Andrew Mendez<sup>1</sup></span>
+          <span>Ami Britti Antoni Gnanaraj<sup>1</sup></span
+          ><span>Mingyu Kang<sup>∀</sup></span
+          ><span>Benjamin Leinwand<sup>∀</sup></span
+          ><span>Andrew Adams Schoen<sup>∀</sup></span
+          ><span>Furong Huang<sup>1,∀,†</sup></span>
+        </div>
+        <div class="affiliations" aria-label="Author affiliations">
+          <div class="affiliation affiliation-umd">
+            <span class="affiliation-name"
+              ><sup>1</sup> University of Maryland</span
+            >
+            <div class="affiliation-logo">
+              <img
+                src="assets/umd-wordmark.webp"
+                alt="University of Maryland"
+                width="1142"
+                height="208"
+              />
+            </div>
+          </div>
+          <div class="affiliation affiliation-allpurpose">
+            <span class="affiliation-name"><sup>∀</sup> All Purpose AI</span>
+            <div class="affiliation-logo">
+              <img
+                src="assets/allpurpose.png"
+                alt="All Purpose"
+                width="1000"
+                height="139"
+              />
+            </div>
+          </div>
+        </div>
+        <p class="author-note">
+          <span>* Equal contribution; order decided by coin flip.</span
+          ><span
+            >† Corresponding author:
+            <a href="mailto:furongh@umd.edu">furongh@umd.edu</a></span
+          >
+        </p>
+        <div
+          class="resource-buttons"
+          id="hero-resources"
+          aria-label="Project links"
+        ></div>
+        <p class="tldr">
+          <strong>TL;DR:</strong> LatentShield makes latent multi-agent
+          collaboration monitorable: agents communicate in latent space within
+          each MDU, while safety checks precede the token-space decisions passed
+          between MDUs.
+        </p>
+      </section>
+
+      <section class="container overview-section" id="overview">
+        <h2>How LatentShield works</h2>
+        <p class="section-lead">
+          Latent communication stays within each Multi-Agent Decision Unit
+          (MDU).<br class="desktop-break" />
+          LatentShield checks the contributors’ trajectory before each decision
+          is passed downstream.
+        </p>
+        <div class="demo" id="demo" data-phase="0" data-risk="high">
+          <div class="demo-toolbar">
+            <span
+              >Latent collaboration → monitored decisions → token handoffs</span
+            >
+            <div
+              class="segmented"
+              role="group"
+              aria-label="Illustrative trajectory risk"
+            >
+              <button type="button" data-risk="high" aria-pressed="true">
+                High risk</button
+              ><button type="button" data-risk="low" aria-pressed="false">
+                Low risk
+              </button>
+            </div>
+          </div>
+          <div
+            class="diagram-scroll"
+            tabindex="0"
+            aria-label="Animated multi-MDU workflow; scroll horizontally on small screens"
+          >
+            <svg
+              class="hero-diagram"
+              id="workflow-svg"
+              viewBox="0 0 1400 414"
+              role="img"
+              aria-labelledby="diagram-title diagram-desc"
+            >
+              <title id="diagram-title">
+                LatentShield monitors a workflow composed of multiple MDUs
+              </title>
+              <desc id="diagram-desc">
+                A user query enters MDU 1. Three agents collaborate in latent
+                space. Their trajectory is read by LatentShield, which sends a
+                risk-dependent control signal to the decision node. That node
+                produces a token handoff to MDU 2. Two parallel contributors and
+                a merging contributor form a new latent trajectory, checked by a
+                second LatentShield monitor before the second decision node
+                produces the final output.
+              </desc>
+              <defs>
+                <marker
+                  id="arrow-latent"
+                  markerWidth="7"
+                  markerHeight="7"
+                  refX="6"
+                  refY="3"
+                  orient="auto"
+                >
+                  <path d="M0 0L6 3 0 6Z" fill="#648aca" />
+                </marker>
+                <marker
+                  id="arrow-token"
+                  markerWidth="7"
+                  markerHeight="7"
+                  refX="6"
+                  refY="3"
+                  orient="auto"
+                >
+                  <path d="M0 0L6 3 0 6Z" fill="#d78a46" />
+                </marker>
+                <marker
+                  id="arrow-monitor"
+                  markerWidth="7"
+                  markerHeight="7"
+                  refX="6"
+                  refY="3"
+                  orient="auto"
+                >
+                  <path d="M0 0L6 3 0 6Z" fill="#168b8d" />
+                </marker>
+                <marker
+                  id="inhibit-control"
+                  viewBox="0 0 12 12"
+                  markerWidth="14"
+                  markerHeight="14"
+                  markerUnits="userSpaceOnUse"
+                  refX="6"
+                  refY="6"
+                  orient="auto"
+                >
+                  <path
+                    d="M6 1V11"
+                    fill="none"
+                    stroke="#168b8d"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-dasharray="none"
+                  />
+                </marker>
+                <symbol id="agent-symbol" viewBox="0 0 48 48">
+                  <path d="M24 6v7" stroke="#81918b" stroke-width="2" />
+                  <circle
+                    cx="24"
+                    cy="5"
+                    r="3"
+                    fill="#d5e3d7"
+                    stroke="#81918b"
+                  />
+                  <rect
+                    x="7"
+                    y="13"
+                    width="34"
+                    height="27"
+                    rx="8"
+                    fill="#f7faf9"
+                    stroke="#7e918c"
+                    stroke-width="2"
+                  />
+                  <rect
+                    x="12"
+                    y="19"
+                    width="24"
+                    height="15"
+                    rx="5"
+                    fill="#c8dcd7"
+                  />
+                  <circle cx="18" cy="25" r="2" fill="#45636a" />
+                  <circle cx="30" cy="25" r="2" fill="#45636a" />
+                  <path
+                    d="M21 29q3 3 6 0M3 21v11M45 21v11"
+                    fill="none"
+                    stroke="#7e918c"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </symbol>
+              </defs>
+              <rect
+                x="110"
+                y="42"
+                width="525"
+                height="348"
+                rx="16"
+                class="mdu-outline"
+              />
+              <rect
+                x="755"
+                y="42"
+                width="525"
+                height="348"
+                rx="16"
+                class="mdu-outline"
+              />
+              <text x="130" y="72" class="mdu-title">MDU 1</text>
+              <text x="615" y="72" text-anchor="end" class="mdu-type">
+                Chain
+              </text>
+              <text x="775" y="72" class="mdu-title">MDU 2</text>
+              <text x="1260" y="72" text-anchor="end" class="mdu-type">
+                Fork–join
+              </text>
+              <path d="M500 110V246M1145 110V246" class="boundary-line" />
+              <text x="500" y="96" text-anchor="middle" class="boundary-label">
+                Decision boundary
+              </text>
+              <text x="1145" y="96" text-anchor="middle" class="boundary-label">
+                Decision boundary
+              </text>
+              <path
+                id="flow-input"
+                d="M80 170H135"
+                class="workflow-path token-path"
+              />
+              <g
+                id="flow-collab-1"
+                class="workflow-path latent-path"
+                data-motion-path="motion-collab-1"
+              >
+                <path d="M195 170H230" />
+                <path d="M290 170H325" />
+              </g>
+              <path
+                id="motion-collab-1"
+                d="M165 170H355"
+                class="motion-route"
+                aria-hidden="true"
+              />
+              <path
+                id="flow-context-1"
+                d="M385 170H535"
+                class="workflow-path latent-path"
+                data-motion-path="motion-context-1"
+              />
+              <path
+                id="motion-context-1"
+                d="M355 170H565"
+                class="motion-route"
+                aria-hidden="true"
+              />
+              <path
+                id="flow-monitor-1"
+                d="M385 170H413Q425 170 425 182V253Q425 265 413 265H222Q210 265 210 277V318Q210 330 222 330H250"
+                class="workflow-path monitor-path"
+                data-motion-path="motion-monitor-1"
+              />
+              <path
+                id="motion-monitor-1"
+                d="M355 170H413Q425 170 425 182V253Q425 265 413 265H222Q210 265 210 277V318Q210 330 222 330H250C266 330 260 354 278 354H442Q470 354 470 330"
+                class="motion-route"
+                aria-hidden="true"
+              />
+              <path
+                id="flow-control-1"
+                d="M470 330H553Q565 330 565 318V208"
+                class="workflow-path control-path"
+              />
+              <path
+                id="flow-handoff"
+                d="M595 170H690"
+                class="workflow-path token-path"
+                data-motion-path="motion-handoff"
+              />
+              <path
+                id="motion-handoff"
+                d="M565 170H690"
+                class="motion-route"
+                aria-hidden="true"
+              />
+              <path
+                id="flow-branch-top"
+                d="M690 170H708Q720 170 720 158V132Q720 120 732 120H770"
+                class="workflow-path token-path"
+              />
+              <path
+                id="flow-branch-bottom"
+                d="M690 170H708Q720 170 720 182V208Q720 220 732 220H770"
+                class="workflow-path token-path"
+              />
+              <path
+                id="flow-join-top"
+                d="M830 120H865L923 157"
+                class="workflow-path latent-path"
+              />
+              <path
+                id="flow-join-bottom"
+                d="M830 220H865L923 183"
+                class="workflow-path latent-path"
+              />
+              <path
+                id="flow-context-2"
+                d="M980 170H1180"
+                class="workflow-path latent-path"
+                data-motion-path="motion-context-2"
+              />
+              <path
+                id="motion-context-2"
+                d="M950 170H1210"
+                class="motion-route"
+                aria-hidden="true"
+              />
+              <path
+                id="flow-monitor-2"
+                d="M980 170H1008Q1020 170 1020 182V253Q1020 265 1008 265H867Q855 265 855 277V318Q855 330 867 330H895"
+                class="workflow-path monitor-path"
+                data-motion-path="motion-monitor-2"
+              />
+              <path
+                id="motion-monitor-2"
+                d="M950 170H1008Q1020 170 1020 182V253Q1020 265 1008 265H867Q855 265 855 277V318Q855 330 867 330H895C911 330 905 354 923 354H1087Q1115 354 1115 330"
+                class="motion-route"
+                aria-hidden="true"
+              />
+              <path
+                id="flow-control-2"
+                d="M1115 330H1198Q1210 330 1210 318V208"
+                class="workflow-path control-path"
+              />
+              <path
+                id="flow-output"
+                d="M1240 170H1320"
+                class="workflow-path token-path"
+              />
+              <g id="agent-1" class="agent-node">
+                <circle cx="165" cy="170" r="30" />
+                <use
+                  href="#agent-symbol"
+                  x="143"
+                  y="147"
+                  width="44"
+                  height="44"
+                />
+                <text x="165" y="219" text-anchor="middle" class="agent-label">
+                  Agent 1
+                </text>
+              </g>
+              <g id="agent-2" class="agent-node">
+                <circle cx="260" cy="170" r="30" />
+                <use
+                  href="#agent-symbol"
+                  x="238"
+                  y="147"
+                  width="44"
+                  height="44"
+                />
+                <text x="260" y="219" text-anchor="middle" class="agent-label">
+                  Agent 2
+                </text>
+              </g>
+              <g id="agent-3" class="agent-node">
+                <circle cx="355" cy="170" r="30" />
+                <use
+                  href="#agent-symbol"
+                  x="333"
+                  y="147"
+                  width="44"
+                  height="44"
+                />
+                <text x="355" y="219" text-anchor="middle" class="agent-label">
+                  Agent 3
+                </text>
+              </g>
+              <g id="decision-1" class="agent-node decision-node">
+                <circle cx="565" cy="170" r="30" />
+                <use
+                  href="#agent-symbol"
+                  x="543"
+                  y="147"
+                  width="44"
+                  height="44"
+                />
+                <text x="565" y="124" text-anchor="middle" class="agent-label">
+                  Decision node
+                </text>
+              </g>
+              <g id="agent-4" class="agent-node">
+                <circle cx="800" cy="120" r="30" />
+                <use
+                  href="#agent-symbol"
+                  x="778"
+                  y="97"
+                  width="44"
+                  height="44"
+                />
+                <text x="800" y="169" text-anchor="middle" class="agent-label">
+                  Agent 1
+                </text>
+              </g>
+              <g id="agent-5" class="agent-node">
+                <circle cx="800" cy="220" r="30" />
+                <use
+                  href="#agent-symbol"
+                  x="778"
+                  y="197"
+                  width="44"
+                  height="44"
+                />
+                <text x="800" y="269" text-anchor="middle" class="agent-label">
+                  Agent 2
+                </text>
+              </g>
+              <g id="agent-6" class="agent-node">
+                <circle cx="950" cy="170" r="30" />
+                <use
+                  href="#agent-symbol"
+                  x="928"
+                  y="147"
+                  width="44"
+                  height="44"
+                />
+                <text x="950" y="219" text-anchor="middle" class="agent-label">
+                  Agent 3
+                </text>
+              </g>
+              <g id="decision-2" class="agent-node decision-node">
+                <circle cx="1210" cy="170" r="30" />
+                <use
+                  href="#agent-symbol"
+                  x="1188"
+                  y="147"
+                  width="44"
+                  height="44"
+                />
+                <text x="1210" y="124" text-anchor="middle" class="agent-label">
+                  Decision node
+                </text>
+              </g>
+              <g id="query-node" class="token-node">
+                <rect x="0" y="144" width="80" height="52" rx="7" />
+                <text x="40" y="163" text-anchor="middle">User</text>
+                <text x="40" y="185" text-anchor="middle">query</text>
+              </g>
+              <g id="output-node" class="token-node">
+                <rect x="1320" y="144" width="80" height="52" rx="7" />
+                <text x="1360" y="163" text-anchor="middle">Final</text>
+                <text x="1360" y="185" text-anchor="middle">output</text>
+              </g>
+              <text
+                x="317"
+                y="253"
+                text-anchor="middle"
+                class="trajectory-label"
+              >
+                Latent trajectory
+              </text>
+              <text
+                x="938"
+                y="253"
+                text-anchor="middle"
+                class="trajectory-label"
+              >
+                Latent trajectory
+              </text>
+              <g id="shield-1" class="shield-node">
+                <rect x="250" y="294" width="220" height="72" rx="10" />
+                <g class="shield-lockup" transform="translate(278.8 330)">
+                  <use
+                    href="#i-shield"
+                    x="0"
+                    y="-13"
+                    width="26"
+                    height="26"
+                    class="shield-icon"
+                  />
+                  <text
+                    x="36"
+                    y="0"
+                    dominant-baseline="central"
+                    class="shield-name"
+                  >
+                    LatentShield
+                  </text>
+                </g>
+              </g>
+              <text x="517.5" y="317" text-anchor="middle" class="risk-action">
+                Safety instruction
+              </text>
+              <g id="shield-2" class="shield-node">
+                <rect x="895" y="294" width="220" height="72" rx="10" />
+                <g class="shield-lockup" transform="translate(923.8 330)">
+                  <use
+                    href="#i-shield"
+                    x="0"
+                    y="-13"
+                    width="26"
+                    height="26"
+                    class="shield-icon"
+                  />
+                  <text
+                    x="36"
+                    y="0"
+                    dominant-baseline="central"
+                    class="shield-name"
+                  >
+                    LatentShield
+                  </text>
+                </g>
+              </g>
+              <text x="1162.5" y="317" text-anchor="middle" class="risk-action">
+                Safety instruction
+              </text>
+              <g id="packet-layer" aria-hidden="true"></g>
+            </svg>
+          </div>
+          <div class="diagram-legend">
+            <span><i class="latent-key"></i> Latent communication</span
+            ><span><i class="monitor-key"></i> Monitoring & intervention</span
+            ><span><i class="token-key"></i> Token handoff</span
+            ><span><i class="boundary-key"></i> Decision boundary</span>
+          </div>
+          <div class="animation-controls">
+            <button id="play-toggle" type="button" aria-label="Pause animation">
+              Ⅱ Pause</button
+            ><button id="replay" type="button" aria-label="Replay animation">
+              ↻ Replay</button
+            ><label class="sr-only" for="animation-progress"
+              >Animation progress</label
+            ><input
+              id="animation-progress"
+              type="range"
+              min="0"
+              max="1000"
+              value="0"
+              step="1"
+            /><span id="phase-label">MDU 1 · Collaborate</span>
+          </div>
+          <p id="step-description" class="step-description">
+            A token query enters the first MDU; agents begin latent
+            collaboration.
+          </p>
+        </div>
+        <p class="teaser-caption">
+          <strong>LatentShield</strong> connects local latent collaboration
+          through monitored decision boundaries. The animation illustrates a
+          two-MDU workflow; blue states remain local, and only orange token
+          messages cross between units.
+        </p>
+      </section>
+
+      <section class="abstract-section" id="abstract">
+        <div class="container">
+          <h2>Abstract</h2>
+          <p id="full-abstract"></p>
+        </div>
+      </section>
+
+      <section class="container section" id="method">
+        <div class="section-intro">
+          <h2>Learning to monitor latent collaboration</h2>
+          <p>
+            A small trainable readout connects agent representations to an
+            existing safety model. The agent backbone and Llama Guard remain
+            frozen.
+          </p>
+        </div>
+        <div class="method-grid">
+          <article>
+            <span class="method-index">01</span>
+            <h3>Pool what matters</h3>
+            <p>
+              A learned query attends over the contributor states, turning a
+              variable-length trajectory into one fixed-size representation.
+            </p>
+          </article>
+          <article>
+            <span class="method-index">02</span>
+            <h3>Align with a safety model</h3>
+            <p>
+              A two-layer MLP maps the pooled vector into Llama Guard’s residual
+              stream. Its frozen remaining layers estimate harmful-compliance
+              risk.
+            </p>
+          </article>
+          <article>
+            <span class="method-index">03</span>
+            <h3>Intervene before generation</h3>
+            <p>
+              When risk exceeds a validation-selected threshold, add a safety
+              instruction to the decision node. Otherwise, generation proceeds
+              normally.
+            </p>
+          </article>
+        </div>
+        <figure class="paper-figure">
+          <button
+            class="figure-zoom"
+            data-image="assets/method.png"
+            data-caption="LatentShield training and runtime intervention"
+            aria-label="Enlarge method figure"
+          >
+            <img
+              src="assets/method.png"
+              alt="Paper figure: trainable learned-query pooling and MLP alignment to frozen Llama Guard, followed by risk-conditioned runtime intervention"
+              loading="lazy"
+              width="1800"
+              height="871"
+            /><span class="zoom-label">↗ Expand figure</span>
+          </button>
+          <figcaption>
+            Training and runtime intervention. Only the attention query and MLP
+            aligner are trained; the backbone and Llama Guard stay fixed.
+          </figcaption>
+        </figure>
+        <div class="training-note">
+          <svg class="icon"><use href="#i-shield" /></svg>
+          <p>
+            <strong>Monitoring without intermediate text decoding.</strong> The
+            monitor operates directly on the contributor latent trajectory. The
+            intervention augments the decision node’s prompt while preserving
+            its latent context.
+          </p>
+        </div>
+      </section>
+
+      <section class="results-section" id="results">
+        <div class="container section">
+          <div class="section-intro">
+            <h2>Safety and utility across five backbones</h2>
+            <p>
+              Evaluated across five backbones, harmful-compliance benchmarks,
+              and over-refusal benchmarks. Explore the complete operating-point
+              sweep below.
+            </p>
+          </div>
+          <div class="result-controls">
+            <label
+              >Backbone<select id="model-select">
+                <option value="0">Qwen3-4B</option>
+                <option value="1">Qwen3-4B-Instruct</option>
+                <option value="2">Qwen3-14B</option>
+                <option value="3">Gemma-2-2B-IT</option>
+                <option value="4">Phi-3-mini-4K-Instruct</option>
+              </select></label
+            ><label
+              >Operating point<select id="point-select">
+                <option>p01</option>
+                <option>p05</option>
+                <option selected>p10</option>
+                <option>p20</option>
+                <option>p50</option>
+              </select></label
+            >
+            <div class="metric-key">
+              MEAN FAILURE RATE <span>↓ Lower is better</span>
+            </div>
+          </div>
+          <div
+            class="result-chart"
+            id="result-chart"
+            aria-label="Mean failure rate by method"
+          ></div>
+          <div class="result-foot">
+            <p id="result-summary" aria-live="polite"></p>
+            <span
+              >Mean ± standard deviation across 3 training seeds<br />for
+              learned monitors; other baselines evaluated once.</span
+            >
+          </div>
+          <details class="technical-details">
+            <summary>
+              Metric definition & complete results <span>+</span>
+            </summary>
+            <p>
+              <strong>MFR = ¼ (HB-ASR + SR-ASR + ORB-RR + PH-FRR).</strong>
+              HarmBench and StrongREJECT measure harmful compliance;
+              OR-Bench-Hard-1K and PHTest measure over-refusal. pXX targets XX%
+              false positives on benign validation trajectories. Each threshold
+              remains fixed for test evaluation; it is not a test-time refusal
+              rate.
+            </p>
+            <div class="table-scroll">
+              <table id="full-results-table">
+                <caption>
+                  Reported mean failure rates. Learned monitor values are mean ±
+                  training-seed standard deviation.
+                </caption>
+              </table>
+            </div>
+          </details>
+          <div class="utility-block">
+            <div>
+              <h3>Preserving useful reasoning.</h3>
+              <p>
+                LatentShield retains competitive benign accuracy overall on
+                GPQA-Diamond and MMLU-Pro.
+              </p>
+            </div>
+            <figure class="paper-figure">
+              <button
+                class="figure-zoom"
+                data-image="assets/utility.png"
+                data-caption="Benign utility on GPQA-Diamond and MMLU-Pro"
+                aria-label="Enlarge benign utility figure"
+              >
+                <img
+                  src="assets/utility.png"
+                  alt="Paper bar charts comparing benign utility across five backbones and operating points"
+                  loading="lazy"
+                  width="2000"
+                  height="840"
+                /><span class="zoom-label">↗ Expand</span>
+              </button>
+              <figcaption>
+                Benign accuracy from the supplied manuscript. Error bars show
+                variation across training seeds.
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="container section" id="generalization">
+        <div class="section-intro">
+          <h2>Generalization to unseen MDU structures</h2>
+          <p>
+            Train on a four-agent chain. Transfer the frozen monitor to six
+            unseen structures, with the source-validation threshold unchanged.
+          </p>
+        </div>
+        <div class="topology-explorer">
+          <div class="topology-main">
+            <div class="topology-toolbar">
+              <span class="mini-label">CHOOSE AN UNSEEN STRUCTURE</span
+              ><label class="sr-only" for="topology-select">MDU topology</label
+              ><select id="topology-select">
+                <option value="fuse">Fuse-CD · 5 agents</option>
+                <option value="wide">Wide fan-out · 5 agents</option>
+                <option value="tree" selected>Tree · 6 agents</option>
+                <option value="twin">Twin chains · 6 agents</option>
+                <option value="fan">Fan-out + fuse · 6 agents</option>
+                <option value="nine">9-agent fuse · 9 agents</option>
+              </select>
+            </div>
+            <svg
+              id="topology-svg"
+              viewBox="0 0 600 280"
+              role="img"
+              aria-label="Selected multi-agent topology"
+            ></svg>
+            <div class="topology-legend">
+              <span><i></i> Contributor</span><span><i></i> Decision node</span
+              ><span>Dashed line: decision boundary</span>
+            </div>
+          </div>
+          <aside class="topology-result">
+            <h3 id="topology-name">Tree · 6 agents</h3>
+            <div class="transfer-compare">
+              <div>
+                <span>LatentMAS</span><strong id="topology-base">0.181</strong>
+              </div>
+              <span class="transfer-arrow">→</span>
+              <div>
+                <span>LatentShield</span
+                ><strong id="topology-ours">0.096</strong>
+              </div>
+            </div>
+            <p>Mean failure rate · lower is better</p>
+            <div class="transfer-rule"></div>
+            <p>
+              <strong>Qwen3-4B · fixed p10</strong><br />No target-topology
+              retraining.<br />No threshold recalibration.
+            </p>
+            <small>Means over three independently trained monitors.</small>
+          </aside>
+        </div>
+        <p class="transfer-summary">
+          Across all six unseen structures, average MFR decreases from
+          <strong>0.180 to <span class="green">0.098</span></strong
+          >.
+        </p>
+        <details class="technical-details">
+          <summary>
+            View all evaluated structures & results <span>+</span>
+          </summary>
+          <button
+            class="figure-zoom"
+            data-image="assets/topologies.png"
+            data-caption="Source chain and six evaluated unseen MDU structures"
+            aria-label="Enlarge all topology diagrams"
+          >
+            <img
+              src="assets/topologies.png"
+              alt="The source chain and all six evaluated unseen MDU communication graphs"
+              loading="lazy"
+              width="1800"
+              height="1021"
+            />
+          </button>
+          <div class="table-scroll"><table id="topology-table"></table></div>
+        </details>
+      </section>
+
+      <section class="composition-section">
+        <div class="container section">
+          <div class="section-intro">
+            <h2>Composing MDUs into larger workflows</h2>
+            <p>
+              Only token-space messages cross MDU boundaries. Each receiving
+              unit forms its own latent trajectory and is assessed before
+              releasing its next decision.
+            </p>
+          </div>
+          <figure class="paper-figure composition-figure">
+            <button
+              class="figure-zoom"
+              data-image="assets/composition.png"
+              data-caption="MDU interfaces and composition into a larger workflow"
+              aria-label="Enlarge workflow composition figure"
+            >
+              <img
+                src="assets/composition.png"
+                alt="Paper figure showing different MDU topologies and composition through monitored token-space handoffs"
+                loading="lazy"
+                width="1600"
+                height="660"
+              /><span class="zoom-label">↗ Expand figure</span>
+            </button>
+            <figcaption>
+              Different MDU topologies share the same interface: latent
+              collaboration inside, monitored token-space decisions between
+              units.
+            </figcaption>
+          </figure>
+          <div class="evidence-grid">
+            <article>
+              <span class="mini-label">ADAPTIVE ATTACKS</span>
+              <h3>0.144 <span>→</span> <em>0.118</em></h3>
+              <p>MFR under PIArena prompt injection.</p>
+              <small>Qwen3-14B · ±0.017 training-seed SD</small>
+            </article>
+            <article>
+              <span class="mini-label">AGENTIC SAFETY · DTAP</span>
+              <h3>46.0% <span>→</span> <em>39.3%</em></h3>
+              <p>
+                Direct attack success rate; benign completion rises from 35.0%
+                to 39.0%.
+              </p>
+              <small>p05 · ASR ±4.5 pp · completion ±1.7 pp</small>
+            </article>
+            <article>
+              <span class="mini-label">COMPOSED WORKFLOW</span>
+              <h3>0.099 <span>→</span> <em>0.090</em></h3>
+              <p>MFR with monitoring at every MDU boundary.</p>
+              <small>Qwen3-4B · p01 · ±0.006 training-seed SD</small>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="container citation-section" id="citation">
+        <h2>BibTeX</h2>
+        <div class="citation-code">
+          <div>
+            <span>latentshield.bib</span
+            ><button id="copy-citation">
+              <svg class="icon"><use href="#i-copy" /></svg><span>Copy</span>
+            </button>
+          </div>
+          <pre><code id="bibtex"></code></pre>
+          <span class="sr-only" id="copy-status" role="status"></span>
+        </div>
+      </section>
+    </main>
+    <footer class="container">
+      <p>LatentShield · University of Maryland & All Purpose AI</p>
+      <p>
+        <a href="mailto:furongh@umd.edu">Contact</a> ·
+        <a href="#top">Back to top ↑</a>
+      </p>
+    </footer>
+    <dialog id="figure-dialog" aria-labelledby="dialog-caption">
+      <button id="close-dialog" aria-label="Close enlarged figure">✕</button
+      ><img id="dialog-image" alt="" />
+      <p id="dialog-caption"></p>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
