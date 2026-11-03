@@ -49,7 +49,7 @@
     <script src="app.js" defer></script>
   </head>
   <body>
-    <a class="skip-link" href="#overview">Skip to content</a>
+    <a class="skip-link" href="#motivation">Skip to content</a>
     <svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <symbol id="i-shield" viewBox="0 0 24 24">
@@ -87,9 +87,9 @@
     </svg>
     <header class="site-header">
       <nav aria-label="Main navigation">
-        <a href="#top">Overview</a><a href="#overview">How it works</a
+        <a href="#motivation">Motivation</a><a href="#overview">Overview</a
         ><a href="#method">Method</a><a href="#results">Results</a
-        ><a href="#generalization">Generalization</a
+        ><a href="#generalization">Generalization</a><a href="#composition">Workflows</a
         ><a href="#citation">BibTeX</a>
       </nav>
     </header>
@@ -168,14 +168,59 @@
         </p>
       </section>
 
+      <section class="container abstract-section" id="abstract">
+        <h2>Abstract</h2>
+        <p id="full-abstract"></p>
+      </section>
+
+      <section class="container section motivation-section" id="motivation">
+        <h2>From TextMAS to LatentMAS</h2>
+        <div class="reading-copy">
+          <p>In a text multi-agent system (TextMAS), several language-model agents
+            work on a task together by exchanging written messages.
+            A text-based safety monitor can read these messages to check for unsafe behavior.
+            Generating each message takes time and can leave out information
+            held in the agent's internal state.</p>
+          <p>A latent multi-agent system (LatentMAS) lets agents collaborate by
+            exchanging their internal numerical representations, called latent states.
+            Passing these states directly preserves
+            information that text generation can discard and avoids repeatedly
+            generating and re-encoding intermediate messages. In its reported
+            experiments, LatentMAS improves reasoning accuracy while using fewer
+            output tokens and running faster than its text-based multi-agent
+            baselines.</p>
+          <p>The intermediate text trace disappears in LatentMAS. Conventional
+            text-based monitors lose access to the collaboration that produces
+            the final answer. We aim to design a scalable monitoring framework
+            for LatentMAS.</p>
+        </div>
+        <figure class="walkthrough-film">
+          <video controls playsinline muted preload="none"
+            poster="assets/animations/motivation.jpg"
+            aria-label="Animation comparing text messages with latent communication"
+            aria-describedby="motivation-caption">
+            <source src="assets/animations/motivation.mp4" type="video/mp4" />
+            <p><a href="assets/animations/motivation.mp4">Watch the communication animation</a></p>
+          </video>
+          <figcaption id="motivation-caption">State blocks are schematic.</figcaption>
+        </figure>
+      </section>
+
       <section class="container overview-section" id="overview">
-        <h2>How LatentShield works</h2>
-        <p class="section-lead">
-          Latent communication stays within each Multi-Agent Decision Unit
-          (MDU).<br class="desktop-break" />
-          LatentShield checks the contributors’ trajectory before each decision
-          is passed downstream.
-        </p>
+        <h2>Overview</h2>
+        <div class="reading-copy">
+          <p>LatentShield uses local LatentMAS teams as reusable building blocks,
+            called Multi-Agent Decision Units (MDUs), to construct larger workflows.
+            Within each MDU, contributor agents collaborate through latent states,
+            retaining information that text generation can discard. Before the
+            unit's designated decision node generates an output, LatentShield
+            checks the contributors' latent trajectory and adds a safety instruction
+            if the predicted risk exceeds a threshold. The decision node then
+            passes a token-space message to downstream MDUs. This gives every unit
+            a defined point for monitoring and lets us scale the workflow without
+            propagating its full latent history across units, while preserving
+            latent collaboration within each team.</p>
+        </div>
         <div class="demo" id="demo" data-phase="0" data-risk="high">
           <div class="demo-toolbar">
             <span
@@ -666,78 +711,74 @@
         </p>
       </section>
 
-      <section class="abstract-section" id="abstract">
-        <div class="container">
-          <h2>Abstract</h2>
-          <p id="full-abstract"></p>
-        </div>
-      </section>
-
       <section class="container section" id="method">
         <div class="section-intro">
           <h2>Learning to monitor latent collaboration</h2>
-          <p>
-            A small trainable readout connects agent representations to an
-            existing safety model. The agent backbone and Llama Guard remain
-            frozen.
-          </p>
+          <p>The monitor predicts whether the team's next output will comply
+            with a harmful request. A learned readout connects the contributor
+            states to Llama Guard, an existing safety model.</p>
         </div>
-        <div class="method-grid">
-          <article>
-            <span class="method-index">01</span>
-            <h3>Pool what matters</h3>
-            <p>
-              A learned query attends over the contributor states, turning a
-              variable-length trajectory into one fixed-size representation.
-            </p>
-          </article>
-          <article>
-            <span class="method-index">02</span>
-            <h3>Align with a safety model</h3>
-            <p>
-              A two-layer MLP maps the pooled vector into Llama Guard’s residual
-              stream. Its frozen remaining layers estimate harmful-compliance
-              risk.
-            </p>
-          </article>
-          <article>
-            <span class="method-index">03</span>
-            <h3>Intervene before generation</h3>
-            <p>
-              When risk exceeds a validation-selected threshold, add a safety
-              instruction to the decision node. Otherwise, generation proceeds
-              normally.
-            </p>
-          </article>
-        </div>
-        <figure class="paper-figure">
-          <button
-            class="figure-zoom"
-            data-image="assets/method.png"
+        <figure class="paper-figure method-figure">
+          <button class="figure-zoom" data-image="assets/method.png"
             data-caption="LatentShield training and runtime intervention"
-            aria-label="Enlarge method figure"
-          >
-            <img
-              src="assets/method.png"
+            aria-label="Enlarge method figure">
+            <img src="assets/method.png"
               alt="Paper figure: trainable learned-query pooling and MLP alignment to frozen Llama Guard, followed by risk-conditioned runtime intervention"
-              loading="lazy"
-              width="1800"
-              height="871"
-            /><span class="zoom-label">↗ Expand figure</span>
+              loading="lazy" width="1800" height="871" />
+            <span class="zoom-label">↗ Expand figure</span>
           </button>
-          <figcaption>
-            Training and runtime intervention. Only the attention query and MLP
-            aligner are trained; the backbone and Llama Guard stay fixed.
-          </figcaption>
+          <figcaption>Training and runtime intervention. Only the attention query and
+            MLP aligner are trained; the backbone and Llama Guard stay fixed.</figcaption>
         </figure>
-        <div class="training-note">
-          <svg class="icon"><use href="#i-shield" /></svg>
-          <p>
-            <strong>Monitoring without intermediate text decoding.</strong> The
-            monitor operates directly on the contributor latent trajectory. The
-            intervention augments the decision node’s prompt while preserving
-            its latent context.
-          </p>
+        <div class="reading-copy">
+          <h3>From a variable-length trajectory to one score</h3>
+          <p>Different teams contribute different numbers of states. A learned
+            query assigns attention weights to those states and pools them into
+            one fixed-size vector. A two-layer MLP maps this vector into an
+            intermediate residual stream of Llama-Guard-3-8B. The remaining
+            frozen layers produce a risk score from their safe and unsafe logits.</p>
+        </div>
+        <figure class="walkthrough-film">
+          <video controls playsinline muted preload="none"
+            poster="assets/animations/readout.jpg"
+            aria-label="Animation of learned-query pooling, MLP alignment and frozen Llama Guard"
+            aria-describedby="readout-caption">
+            <source src="assets/animations/readout.mp4" type="video/mp4" />
+            <p><a href="assets/animations/readout.mp4">Watch the monitor animation</a></p>
+          </video>
+          <figcaption id="readout-caption">State colors and attention weights
+            are illustrative.</figcaption>
+        </figure>
+        <div class="reading-copy training-copy">
+          <h3>Learn from completed outputs</h3>
+          <ol class="training-steps">
+            <li>Run training requests through the MDU. Save the contributor
+              trajectory at the boundary and the decision node's subsequent output.</li>
+            <li>Label harmful compliance using the dataset's prompt annotations
+              and WildGuard's response annotations. A harmful request that receives
+              a refusal is labeled negative.</li>
+            <li>Train the attention query and MLP with weighted binary cross-entropy.
+              Gradients pass through Llama Guard, but its weights and the agent
+              backbone stay fixed.</li>
+          </ol>
+          <p>At runtime, the monitor reads the contributor trajectory before the
+            decision node generates.</p>
+          <h3>Use the score before generation</h3>
+          <p>A threshold selected on held-out validation trajectories determines
+            whether to add a safety instruction. The contributor computation and
+            the decision node's latent context are preserved.</p>
+        </div>
+        <div class="intervention-branches">
+          <div><h4>Above the threshold</h4><p>Add an instruction asking the decision
+            node to refuse briefly and avoid continuing the flagged reasoning.
+            The decision node then generates the output.</p></div>
+          <div><h4>At or below the threshold</h4><p>The decision node generates
+            from its normal input. No safety instruction is added.</p></div>
+        </div>
+        <div class="reading-copy threshold-copy">
+          <p>The p10 operating point sets the threshold at a 10% false-positive
+            rate on benign validation trajectories. This threshold stays fixed
+            during testing.</p>
         </div>
       </section>
 
@@ -794,8 +835,7 @@
               HarmBench and StrongREJECT measure harmful compliance;
               OR-Bench-Hard-1K and PHTest measure over-refusal. pXX targets XX%
               false positives on benign validation trajectories. Each threshold
-              remains fixed for test evaluation; it is not a test-time refusal
-              rate.
+              remains fixed for test evaluation.
             </p>
             <div class="table-scroll">
               <table id="full-results-table">
@@ -809,10 +849,8 @@
           <div class="utility-block">
             <div>
               <h3>Preserving useful reasoning.</h3>
-              <p>
-                LatentShield retains competitive benign accuracy overall on
-                GPQA-Diamond and MMLU-Pro.
-              </p>
+              <p>LatentShield retains competitive benign accuracy overall on
+                GPQA-Diamond and MMLU-Pro.</p>
             </div>
             <figure class="paper-figure">
               <button
@@ -919,7 +957,7 @@
         </details>
       </section>
 
-      <section class="composition-section">
+      <section class="composition-section" id="composition">
         <div class="container section">
           <div class="section-intro">
             <h2>Composing MDUs into larger workflows</h2>
@@ -950,28 +988,55 @@
               units.
             </figcaption>
           </figure>
-          <div class="evidence-grid">
-            <article>
-              <span class="mini-label">ADAPTIVE ATTACKS</span>
-              <h3>0.144 <span>→</span> <em>0.118</em></h3>
-              <p>MFR under PIArena prompt injection.</p>
-              <small>Qwen3-14B · ±0.017 training-seed SD</small>
-            </article>
-            <article>
-              <span class="mini-label">AGENTIC SAFETY · DTAP</span>
-              <h3>46.0% <span>→</span> <em>39.3%</em></h3>
-              <p>
-                Direct attack success rate; benign completion rises from 35.0%
-                to 39.0%.
-              </p>
-              <small>p05 · ASR ±4.5 pp · completion ±1.7 pp</small>
-            </article>
-            <article>
-              <span class="mini-label">COMPOSED WORKFLOW</span>
-              <h3>0.099 <span>→</span> <em>0.090</em></h3>
-              <p>MFR with monitoring at every MDU boundary.</p>
-              <small>Qwen3-4B · p01 · ±0.006 training-seed SD</small>
-            </article>
+          <div class="evaluation-summary">
+            <h3>Additional evaluations</h3>
+            <div class="table-scroll">
+              <table class="evaluation-table">
+                <caption>
+                  LatentMAS and LatentShield under adaptive attacks, agentic
+                  tasks, and MDU composition.
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Evaluation</th>
+                    <th scope="col">Metric</th>
+                    <th scope="col">LatentMAS</th>
+                    <th scope="col">LatentShield</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">PIArena <small>Qwen3-14B · p10</small></th>
+                    <td>Mean failure rate ↓</td>
+                    <td>0.144</td>
+                    <td>0.118 ± 0.017</td>
+                  </tr>
+                  <tr>
+                    <th scope="row" rowspan="2">DTap <small>p05</small></th>
+                    <td>Direct attack success ↓</td>
+                    <td>46.0%</td>
+                    <td>39.3% ± 4.5 pp</td>
+                  </tr>
+                  <tr>
+                    <td>Benign task completion ↑</td>
+                    <td>35.0%</td>
+                    <td>39.0% ± 1.7 pp</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">
+                      Composed workflow <small>Qwen3-4B · p01</small>
+                    </th>
+                    <td>Mean failure rate ↓</td>
+                    <td>0.099</td>
+                    <td>0.090 ± 0.006</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="evaluation-note">
+              LatentShield values are mean ± standard deviation across three
+              training seeds. The composed-workflow baseline has no monitor.
+            </p>
           </div>
         </div>
       </section>

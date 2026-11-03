@@ -619,5 +619,21 @@ window.addEventListener(
   { passive: true },
 );
 updateScroll();
+
+// Keep the walkthrough reader-controlled. Leaving a clip pauses it;
+// returning never starts playback without a user action.
+const walkthroughVideos = [...document.querySelectorAll('.walkthrough-film video')];
+walkthroughVideos.forEach((video) => {
+  video.addEventListener('play', () => {
+    walkthroughVideos.forEach((other) => { if (other !== video) other.pause(); });
+  });
+});
+const videoVisibility = new IntersectionObserver((entries) => {
+  entries.forEach(({ target, isIntersecting }) => { if (!isIntersecting) target.pause(); });
+}, { threshold: 0 });
+walkthroughVideos.forEach((video) => videoVisibility.observe(video));
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) walkthroughVideos.forEach((video) => video.pause());
+});
 document.querySelector("#full-abstract").textContent =
   "Latent communication lets language-model agents exchange continuous representations directly, but removes the textual handoffs inspected by conventional text-based monitors. We introduce LatentShield, which combines a two-scale communication architecture with safety monitoring at decision boundaries. Rather than propagate latent states through an entire agent graph, we partition the workflow into Multi-Agent Decision Units (MDUs): agents communicate in latent space within each MDU, while only token-space messages cross MDU boundaries. Each MDU ends at a designated decision node. Immediately before that node generates the unit’s token output, LatentShield reads the contributor latent trajectory and predicts the risk of harmful compliance. A trainable readout applies learned-query attention to pool the variable-length trajectory and uses an MLP aligner to map the pooled representation into the hidden space of a frozen Llama Guard, without decoding the intermediate communication to text. If the risk score exceeds a validation-selected threshold, LatentShield adds a safety instruction before generation. Across the five backbones, LatentShield achieves the lowest mean failure rate among the evaluated latent-monitoring methods while retaining competitive benign utility overall. On Qwen3-4B, it reduces mean failure rate by 36.2% relative to unguarded LatentMAS. A monitor trained on one MDU structure also transfers without retraining to the evaluated unseen MDU sizes and communication graphs. We further evaluate adaptive prompt-injection attacks and agentic workflows. Together, these results support decision-boundary monitoring as a practical safety interface for latent multi-agent systems.";

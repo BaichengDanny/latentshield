@@ -666,17 +666,20 @@ nav a.active {
   margin: 20px auto 0;
 }
 .abstract-section {
-  padding: 45px 0 47px;
-  background: #f7f8fa;
-}
-.abstract-section .container {
   max-width: 900px;
+  margin: 12px auto 0;
+  padding: 28px 0 10px;
+  border-top: 1px solid var(--line);
+}
+.abstract-section h2 {
+  margin: 0 0 20px;
+  text-align: center;
+  font-size: 25px;
+  font-weight: 600;
 }
 .abstract-section p {
   font-size: 15px;
   line-height: 1.85;
-  text-align: justify;
-  margin-top: 23px;
   color: #525c65;
 }
 .section {
@@ -685,6 +688,77 @@ nav a.active {
 }
 .section-intro {
   margin-bottom: 30px;
+}
+.reading-copy {
+  max-width: 800px;
+  margin: 24px auto;
+  color: #56616a;
+  font-size: 16px;
+  line-height: 1.85;
+}
+.reading-copy p + p {
+  margin-top: 16px;
+}
+.reading-copy h3 {
+  margin: 32px 0 12px;
+  color: var(--ink);
+  font-size: 23px;
+}
+.motivation-section {
+  padding-bottom: 36px;
+}
+.walkthrough-film {
+  max-width: 960px;
+  margin: 30px auto;
+}
+.walkthrough-film video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: white;
+  border: 1px solid var(--line);
+}
+.method-figure {
+  margin: 30px auto 38px;
+}
+.training-steps {
+  padding-left: 25px;
+  margin: 12px 0 18px;
+}
+.training-steps li {
+  padding-left: 6px;
+  margin: 12px 0;
+}
+.training-steps li::marker {
+  color: #7e8d97;
+  font-size: 13px;
+}
+.intervention-branches {
+  max-width: 800px;
+  margin: 22px auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.intervention-branches > div {
+  padding: 12px 0 0 18px;
+  border-left: 2px solid #cf8580;
+}
+.intervention-branches > div + div {
+  border-color: #75a88c;
+}
+.intervention-branches h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.intervention-branches p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.threshold-copy {
+  font-size: 14px;
 }
 .method-grid {
   display: grid;
@@ -747,26 +821,6 @@ figcaption {
   font-size: 12px;
   line-height: 1.75;
   margin-top: 13px;
-}
-.training-note {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line);
-  margin-top: 20px;
-}
-.training-note .icon {
-  color: var(--teal);
-  width: 20px;
-}
-.training-note p {
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--muted);
-}
-.training-note strong {
-  color: #4e616d;
 }
 .result-controls {
   display: flex;
@@ -1097,43 +1151,6 @@ tbody tr.ours {
   max-width: 920px;
   margin: 25px auto;
 }
-.evidence-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 35px;
-  margin-top: 32px;
-}
-.evidence-grid article {
-  padding-top: 15px;
-  border-top: 1px solid var(--line);
-}
-.evidence-grid .mini-label {
-  font-size: 10px;
-}
-.evidence-grid h3 {
-  font-size: 27px;
-  margin: 10px 0;
-  white-space: nowrap;
-  letter-spacing: -1px;
-}
-.evidence-grid h3 > span {
-  color: #a9b7c1;
-  font-size: 22px;
-}
-.evidence-grid em {
-  font-style: normal;
-  color: var(--teal);
-}
-.evidence-grid p {
-  font-size: 13px;
-  color: var(--muted);
-}
-.evidence-grid small {
-  display: block;
-  font-size: 10px;
-  color: #87939b;
-  margin-top: 10px;
-}
 .citation-section {
   padding: 55px 0 45px;
 }
@@ -1268,12 +1285,6 @@ dialog p {
   .topology-result {
     padding-left: 24px;
   }
-  .evidence-grid {
-    gap: 25px;
-  }
-  .evidence-grid h3 {
-    font-size: 24px;
-  }
   .method-grid {
     gap: 26px;
   }
@@ -1287,6 +1298,18 @@ dialog p {
   }
 }
 @media (max-width: 700px) {
+  .reading-copy {
+    font-size: 14px;
+    margin: 20px auto;
+  }
+  .reading-copy h3 {
+    font-size: 21px;
+  }
+  .intervention-branches {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .walkthrough-film { margin-block: 24px; }
   html {
     scroll-padding-top: 65px;
   }
@@ -1481,7 +1504,7 @@ dialog p {
     margin-top: 17px;
   }
   .abstract-section {
-    padding: 30px 0 35px;
+    padding: 24px 0 5px;
   }
   .abstract-section p {
     font-size: 13px;
@@ -1517,14 +1540,6 @@ dialog p {
     font-size: 8px;
     opacity: 1;
     padding: 2px 5px;
-  }
-  .training-note {
-    align-items: flex-start;
-    gap: 10px;
-    padding: 13px 0;
-  }
-  .training-note p {
-    font-size: 11px;
   }
   .result-controls {
     gap: 12px;
@@ -1658,21 +1673,6 @@ dialog p {
     font-size: 12px;
     line-height: 1.8;
   }
-  .evidence-grid {
-    grid-template-columns: 1fr;
-    gap: 22px;
-    margin-top: 25px;
-  }
-  .evidence-grid h3 {
-    font-size: 28px;
-    margin: 7px 0;
-  }
-  .evidence-grid p {
-    font-size: 12px;
-  }
-  .evidence-grid small {
-    font-size: 10px;
-  }
   .citation-section {
     padding: 40px 0 30px;
   }
@@ -1717,5 +1717,76 @@ dialog p {
   *:after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* Additional evaluations use the same scale and type as the surrounding text. */
+.evaluation-summary {
+  margin: 36px auto 0;
+  max-width: 960px;
+}
+.evaluation-summary h3 {
+  font-size: 21px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.evaluation-table {
+  font-size: 14px;
+  width: 100%;
+  white-space: normal;
+}
+.evaluation-table caption {
+  font-size: 13px;
+}
+.evaluation-table th,
+.evaluation-table td {
+  padding: 14px 16px;
+  vertical-align: middle;
+}
+.evaluation-table thead th {
+  background: transparent;
+  font-weight: 600;
+  color: #394b56;
+}
+.evaluation-table th:first-child {
+  padding-left: 0;
+}
+.evaluation-table tbody th {
+  font-weight: 500;
+}
+.evaluation-table td:nth-last-child(-n+2) {
+  font-variant-numeric: tabular-nums;
+}
+.evaluation-table small {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: #7a838c;
+  margin-top: 4px;
+}
+.evaluation-note {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #7a838c;
+}
+@media (max-width: 700px) {
+  .evaluation-table {
+    font-size: 12px;
+  }
+  .evaluation-table th,
+  .evaluation-table td {
+    padding: 11px 7px;
+  }
+}
+@media (max-width: 480px) {
+  .evaluation-table {
+    font-size: 11px;
+  }
+  .evaluation-table thead th {
+    font-size: 10px;
+  }
+  .evaluation-table td:nth-last-child(-n+2) {
+    width: 22%;
   }
 }
