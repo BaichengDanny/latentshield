@@ -45,7 +45,7 @@
       type="font/woff2"
       crossorigin
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=939de7b86d" />
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -714,9 +714,15 @@
       <section class="container section" id="method">
         <div class="section-intro">
           <h2>Learning to monitor latent collaboration</h2>
-          <p>The monitor predicts whether the team's next output will comply
-            with a harmful request. A learned readout connects the contributor
-            states to Llama Guard, an existing safety model.</p>
+          <p>At an MDU's decision boundary, the monitor can access the states
+            produced by all contributor agents. We collect these states into a
+            latent trajectory and train LatentShield to estimate whether the
+            decision node's next output will comply with a harmful request.
+            Trajectories vary in length, and the agents' representations differ
+            from those used by Llama Guard, the safety model we use to assess
+            risk. A learned readout pools each trajectory and maps it into
+            Llama Guard's representation space. Training adjusts this readout
+            while keeping the weights of the agents and Llama Guard fixed.</p>
         </div>
         <figure class="paper-figure method-figure">
           <button class="figure-zoom" data-image="assets/method.png"
@@ -732,11 +738,14 @@
         </figure>
         <div class="reading-copy">
           <h3>From a variable-length trajectory to one score</h3>
-          <p>Different teams contribute different numbers of states. A learned
-            query assigns attention weights to those states and pools them into
-            one fixed-size vector. A two-layer MLP maps this vector into an
-            intermediate residual stream of Llama-Guard-3-8B. The remaining
-            frozen layers produce a risk score from their safe and unsafe logits.</p>
+          <p>A learned query assigns a weight to each contributor state and
+            combines the states into one fixed-size vector. During training,
+            the query learns to give more weight to states that help predict
+            harmful compliance. A small two-layer neural network, the MLP
+            aligner, maps the pooled vector into the internal representation
+            space of Llama-Guard-3-8B. We insert this vector at an intermediate
+            layer. The remaining frozen layers produce scores for the safe
+            and unsafe labels, which we normalize to obtain a risk score.</p>
         </div>
         <figure class="walkthrough-film">
           <video controls playsinline muted preload="none"
@@ -764,9 +773,13 @@
           <p>At runtime, the monitor reads the contributor trajectory before the
             decision node generates.</p>
           <h3>Use the score before generation</h3>
-          <p>A threshold selected on held-out validation trajectories determines
-            whether to add a safety instruction. The contributor computation and
-            the decision node's latent context are preserved.</p>
+          <p>We choose an intervention threshold using held-out validation
+            trajectories, then keep it fixed during testing. At each decision
+            boundary, the monitor compares its risk score with this threshold.
+            A score above the threshold triggers a safety instruction in the decision node's
+            prompt before generation begins. The contributor computation and
+            the decision node's accumulated latent context are preserved, so
+            the intervention changes how the node is instructed to respond.</p>
         </div>
         <div class="intervention-branches">
           <div><h4>Above the threshold</h4><p>Add an instruction asking the decision
@@ -787,9 +800,19 @@
           <div class="section-intro">
             <h2>Safety and utility across five backbones</h2>
             <p>
-              Evaluated across five backbones, harmful-compliance benchmarks,
-              and over-refusal benchmarks. Explore the complete operating-point
-              sweep below.
+              We evaluate whether monitoring reduces harmful compliance while
+              preserving useful responses to benign requests. Each experiment
+              uses one of five language models as the backbone shared by all
+              agents, with a separate monitor trained for each backbone. We
+              compare LatentShield with unguarded LatentMAS, a guard that
+              inspects decoded text (CoT Guard), a guard that asks the backbone
+              to judge its latent computation (Backbone Guard), and a learned
+              linear classifier (Linear Probe). Mean failure rate (MFR)
+              averages four benchmark rates: two measure compliance with harmful
+              requests, and two measure unnecessary refusal of benign requests.
+              Each benchmark has equal weight, and lower MFR is better. On
+              Qwen3-4B at p10, MFR falls from 0.174 to 0.111, a 36.2% reduction
+              relative to unguarded LatentMAS.
             </p>
           </div>
           <div class="result-controls">
@@ -848,9 +871,15 @@
           </details>
           <div class="utility-block">
             <div>
-              <h3>Preserving useful reasoning.</h3>
-              <p>LatentShield retains competitive benign accuracy overall on
-                GPQA-Diamond and MMLU-Pro.</p>
+              <h3>Preserving useful reasoning</h3>
+              <p>We also test whether monitored teams can still solve benign
+                reasoning problems. GPQA-Diamond and MMLU-Pro measure answer
+                accuracy, complementing the refusal-based benchmarks above.
+                We evaluate the same five backbones and compare monitored
+                LatentMAS with the unguarded system and text-based multi-agent
+                references. LatentShield retains competitive accuracy overall
+                across these tasks, with performance varying by backbone and
+                operating point.</p>
             </div>
             <figure class="paper-figure">
               <button
@@ -880,8 +909,14 @@
         <div class="section-intro">
           <h2>Generalization to unseen MDU structures</h2>
           <p>
-            Train on a four-agent chain. Transfer the frozen monitor to six
-            unseen structures, with the source-validation threshold unchanged.
+            Changing the number of agents or the way they communicate changes
+            the latent trajectory presented to the monitor. We test whether a
+            monitor learned on one team can still assess these new trajectories.
+            Using Qwen3-4B throughout, we train on a four-agent chain and apply
+            the frozen monitor to six unseen structures with five, six, or nine
+            agents. Its p10 threshold is calibrated on the source chain and
+            stays fixed for every target structure. LatentShield reduces MFR
+            relative to unguarded LatentMAS on all six evaluated structures.
           </p>
         </div>
         <div class="topology-explorer">
@@ -962,9 +997,17 @@
           <div class="section-intro">
             <h2>Composing MDUs into larger workflows</h2>
             <p>
+              MDUs can be connected in chains, branches, or merging paths, so a
+              workflow can combine teams with different internal structures.
               Only token-space messages cross MDU boundaries. Each receiving
-              unit forms its own latent trajectory and is assessed before
-              releasing its next decision.
+              unit processes those messages through its own latent collaboration,
+              and LatentShield checks its completed contributor trajectory before
+              the next output is generated. This check also assesses the combined
+              context when messages arrive from several branches. In our composed
+              Qwen3-4B experiment, a monitor runs at every MDU boundary, and we
+              evaluate the final workflow response on the same four safety
+              benchmarks. At p01, LatentShield lowers MFR from 0.099 for the
+              unguarded workflow to 0.090.
             </p>
           </div>
           <figure class="paper-figure composition-figure">
@@ -990,6 +1033,17 @@
           </figure>
           <div class="evaluation-summary">
             <h3>Additional evaluations</h3>
+            <div class="reading-copy">
+              <p>We also evaluate monitoring under adaptive prompt injection
+                and in tasks that produce actions. PIArena generates adaptive
+                attacks against the Qwen3-14B system, testing the monitor under
+                adversarial prompts beyond the standard benchmark setting.
+                In DTap, an MDU can produce an action such as a tool call, and
+                LatentShield checks the trajectory before that action is
+                generated. We measure both direct attack success and successful
+                completion of benign tasks. LatentShield reduces direct attack
+                success while increasing benign completion in this evaluation.</p>
+            </div>
             <div class="table-scroll">
               <table class="evaluation-table">
                 <caption>

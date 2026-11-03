@@ -374,14 +374,21 @@ nav a.active {
   width: min(1200px, calc(100% - 64px));
   padding: 28px 0 48px;
 }
-.section-lead,
-.section-intro > p {
+.section-lead {
   text-align: center;
   color: var(--muted);
   max-width: 920px;
   margin: 16px auto 0;
   font-size: 16px;
   line-height: 1.75;
+}
+.section-intro > p {
+  max-width: 800px;
+  margin: 24px auto 0;
+  color: #56616a;
+  font-size: 16px;
+  line-height: 1.85;
+  text-align: left;
 }
 .demo {
   margin-top: 28px;
@@ -1017,11 +1024,12 @@ tbody tr.ours {
   margin-bottom: 13px;
 }
 .utility-block p {
-  font-size: 15px;
-  max-width: 850px;
-  text-align: center;
+  font-size: 16px;
+  line-height: 1.85;
+  max-width: 800px;
+  text-align: left;
   margin: auto;
-  color: var(--muted);
+  color: #56616a;
 }
 .utility-block .paper-figure {
   max-width: 1000px;
