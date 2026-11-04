@@ -45,7 +45,22 @@
       type="font/woff2"
       crossorigin
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" href="styles.css?v=939de7b86d" />
+    <script
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+      crossorigin="anonymous"
+      defer
+    ></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -111,21 +126,21 @@
           with Decision-Boundary Monitoring
         </h2>
         <div class="authors" aria-label="Authors">
-          <span>Baicheng Chen<sup>1,*</sup></span
-          ><span>Anirudh Satheesh<sup>1,*</sup></span
-          ><span>Lingzhi Yuan<sup>1</sup></span
-          ><span>Drew Gjerstad<sup>1</sup></span
-          ><span>Andrew Mendez<sup>1</sup></span>
-          <span>Ami Britti Antoni Gnanaraj<sup>1</sup></span
-          ><span>Mingyu Kang<sup>∀</sup></span
-          ><span>Benjamin Leinwand<sup>∀</sup></span
-          ><span>Andrew Adams Schoen<sup>∀</sup></span
-          ><span>Furong Huang<sup>1,∀,†</sup></span>
+          <span>Baicheng Chen<sup>\(1,\ast\)</sup></span
+          ><span>Anirudh Satheesh<sup>\(1,\ast\)</sup></span
+          ><span>Lingzhi Yuan<sup>\(1\)</sup></span
+          ><span>Drew Gjerstad<sup>\(1\)</sup></span
+          ><span>Andrew Mendez<sup>\(1\)</sup></span>
+          <span>Ami Britti Antoni Gnanaraj<sup>\(1\)</sup></span
+          ><span>Mingyu Kang<sup>\(\forall\)</sup></span
+          ><span>Benjamin Leinwand<sup>\(\forall\)</sup></span
+          ><span>Andrew Adams Schoen<sup>\(\forall\)</sup></span
+          ><span>Furong Huang<sup>\(1,\forall,\dagger\)</sup></span>
         </div>
         <div class="affiliations" aria-label="Author affiliations">
           <div class="affiliation affiliation-umd">
             <span class="affiliation-name"
-              ><sup>1</sup> University of Maryland</span
+              ><sup>\(1\)</sup> University of Maryland</span
             >
             <div class="affiliation-logo">
               <img
@@ -137,7 +152,7 @@
             </div>
           </div>
           <div class="affiliation affiliation-allpurpose">
-            <span class="affiliation-name"><sup>∀</sup> All Purpose AI</span>
+            <span class="affiliation-name"><sup>\(\forall\)</sup> All Purpose AI</span>
             <div class="affiliation-logo">
               <img
                 src="assets/allpurpose.png"
@@ -149,9 +164,9 @@
           </div>
         </div>
         <p class="author-note">
-          <span>* Equal contribution; order decided by coin flip.</span
+          <span>\(^{\ast}\) Equal contribution; order decided by coin flip.</span
           ><span
-            >† Corresponding author:
+            >\(^{\dagger}\) Corresponding author:
             <a href="mailto:furongh@umd.edu">furongh@umd.edu</a></span
           >
         </p>
@@ -196,11 +211,11 @@
         </div>
         <figure class="walkthrough-film">
           <video controls playsinline muted preload="none"
-            poster="assets/animations/motivation.jpg"
+            poster="assets/animations/motivation.jpg?v=251c39251d"
             aria-label="Animation comparing text messages with latent communication"
             aria-describedby="motivation-caption">
-            <source src="assets/animations/motivation.mp4" type="video/mp4" />
-            <p><a href="assets/animations/motivation.mp4">Watch the communication animation</a></p>
+            <source src="assets/animations/motivation.mp4?v=af6dd04c83" type="video/mp4" />
+            <p><a href="assets/animations/motivation.mp4?v=af6dd04c83">Watch the communication animation</a></p>
           </video>
           <figcaption id="motivation-caption">State blocks are schematic.</figcaption>
         </figure>
@@ -224,7 +239,7 @@
         <div class="demo" id="demo" data-phase="0" data-risk="high">
           <div class="demo-toolbar">
             <span
-              >Latent collaboration → monitored decisions → token handoffs</span
+              >Latent collaboration \(\rightarrow\) monitored decisions \(\rightarrow\) token handoffs</span
             >
             <div
               class="segmented"
@@ -696,7 +711,7 @@
               max="1000"
               value="0"
               step="1"
-            /><span id="phase-label">MDU 1 · Collaborate</span>
+            /><span id="phase-label">MDU \(1\) · Collaborate</span>
           </div>
           <p id="step-description" class="step-description">
             A token query enters the first MDU; agents begin latent
@@ -749,11 +764,11 @@
         </div>
         <figure class="walkthrough-film">
           <video controls playsinline muted preload="none"
-            poster="assets/animations/readout.jpg"
+            poster="assets/animations/readout.jpg?v=77cb87152e"
             aria-label="Animation of learned-query pooling, MLP alignment and frozen Llama Guard"
             aria-describedby="readout-caption">
-            <source src="assets/animations/readout.mp4" type="video/mp4" />
-            <p><a href="assets/animations/readout.mp4">Watch the monitor animation</a></p>
+            <source src="assets/animations/readout.mp4?v=87d8b73d27" type="video/mp4" />
+            <p><a href="assets/animations/readout.mp4?v=87d8b73d27">Watch the monitor animation</a></p>
           </video>
           <figcaption id="readout-caption">State colors and attention weights
             are illustrative.</figcaption>
@@ -789,7 +804,7 @@
             from its normal input. No safety instruction is added.</p></div>
         </div>
         <div class="reading-copy threshold-copy">
-          <p>The p10 operating point sets the threshold at a 10% false-positive
+          <p>The \(p_{10}\) operating point sets the threshold at a \(10\%\) false-positive
             rate on benign validation trajectories. This threshold stays fixed
             during testing.</p>
         </div>
@@ -811,7 +826,7 @@
               averages four benchmark rates: two measure compliance with harmful
               requests, and two measure unnecessary refusal of benign requests.
               Each benchmark has equal weight, and lower MFR is better. On
-              Qwen3-4B at p10, MFR falls from 0.174 to 0.111, a 36.2% reduction
+              Qwen3-4B at \(p_{10}\), MFR falls from \(0.174\) to \(0.111\), a \(36.2\%\) reduction
               relative to unguarded LatentMAS.
             </p>
           </div>
@@ -834,7 +849,7 @@
               </select></label
             >
             <div class="metric-key">
-              MEAN FAILURE RATE <span>↓ Lower is better</span>
+              MEAN FAILURE RATE <span>\(\downarrow\) Lower is better</span>
             </div>
           </div>
           <div
@@ -845,7 +860,7 @@
           <div class="result-foot">
             <p id="result-summary" aria-live="polite"></p>
             <span
-              >Mean ± standard deviation across 3 training seeds<br />for
+              >Mean \(\pm\) standard deviation across \(3\) training seeds<br />for
               learned monitors; other baselines evaluated once.</span
             >
           </div>
@@ -854,16 +869,16 @@
               Metric definition & complete results <span>+</span>
             </summary>
             <p>
-              <strong>MFR = ¼ (HB-ASR + SR-ASR + ORB-RR + PH-FRR).</strong>
+              <strong>\(\mathrm{MFR} = \frac{1}{4}\left(\text{HB-ASR} + \text{SR-ASR} + \text{ORB-RR} + \text{PH-FRR}\right).\)</strong>
               HarmBench and StrongREJECT measure harmful compliance;
-              OR-Bench-Hard-1K and PHTest measure over-refusal. pXX targets XX%
+              OR-Bench-Hard-1K and PHTest measure over-refusal. \(p_{XX}\) targets \(XX\%\)
               false positives on benign validation trajectories. Each threshold
               remains fixed for test evaluation.
             </p>
             <div class="table-scroll">
               <table id="full-results-table">
                 <caption>
-                  Reported mean failure rates. Learned monitor values are mean ±
+                  Reported mean failure rates. Learned monitor values are mean \(\pm\)
                   training-seed standard deviation.
                 </caption>
               </table>
@@ -914,7 +929,7 @@
             monitor learned on one team can still assess these new trajectories.
             Using Qwen3-4B throughout, we train on a four-agent chain and apply
             the frozen monitor to six unseen structures with five, six, or nine
-            agents. Its p10 threshold is calibrated on the source chain and
+            agents. Its \(p_{10}\) threshold is calibrated on the source chain and
             stays fixed for every target structure. LatentShield reduces MFR
             relative to unguarded LatentMAS on all six evaluated structures.
           </p>
@@ -945,21 +960,21 @@
             </div>
           </div>
           <aside class="topology-result">
-            <h3 id="topology-name">Tree · 6 agents</h3>
+            <h3 id="topology-name">Tree · \(6\) agents</h3>
             <div class="transfer-compare">
               <div>
-                <span>LatentMAS</span><strong id="topology-base">0.181</strong>
+                <span>LatentMAS</span><strong id="topology-base">\(0.181\)</strong>
               </div>
-              <span class="transfer-arrow">→</span>
+              <span class="transfer-arrow">\(\rightarrow\)</span>
               <div>
                 <span>LatentShield</span
-                ><strong id="topology-ours">0.096</strong>
+                ><strong id="topology-ours">\(0.096\)</strong>
               </div>
             </div>
             <p>Mean failure rate · lower is better</p>
             <div class="transfer-rule"></div>
             <p>
-              <strong>Qwen3-4B · fixed p10</strong><br />No target-topology
+              <strong>Qwen3-4B · fixed \(p_{10}\)</strong><br />No target-topology
               retraining.<br />No threshold recalibration.
             </p>
             <small>Means over three independently trained monitors.</small>
@@ -967,7 +982,7 @@
         </div>
         <p class="transfer-summary">
           Across all six unseen structures, average MFR decreases from
-          <strong>0.180 to <span class="green">0.098</span></strong
+          <strong>\(0.180\) to <span class="green">\(0.098\)</span></strong
           >.
         </p>
         <details class="technical-details">
@@ -1006,8 +1021,8 @@
               context when messages arrive from several branches. In our composed
               Qwen3-4B experiment, a monitor runs at every MDU boundary, and we
               evaluate the final workflow response on the same four safety
-              benchmarks. At p01, LatentShield lowers MFR from 0.099 for the
-              unguarded workflow to 0.090.
+              benchmarks. At \(p_{01}\), LatentShield lowers MFR from \(0.099\) for the
+              unguarded workflow to \(0.090\).
             </p>
           </div>
           <figure class="paper-figure composition-figure">
@@ -1060,35 +1075,35 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <th scope="row">PIArena <small>Qwen3-14B · p10</small></th>
-                    <td>Mean failure rate ↓</td>
-                    <td>0.144</td>
-                    <td>0.118 ± 0.017</td>
+                    <th scope="row">PIArena <small>Qwen3-14B · \(p_{10}\)</small></th>
+                    <td>Mean failure rate \(\downarrow\)</td>
+                    <td>\(0.144\)</td>
+                    <td>\(0.118 \pm 0.017\)</td>
                   </tr>
                   <tr>
-                    <th scope="row" rowspan="2">DTap <small>p05</small></th>
-                    <td>Direct attack success ↓</td>
-                    <td>46.0%</td>
-                    <td>39.3% ± 4.5 pp</td>
+                    <th scope="row" rowspan="2">DTap <small>\(p_{05}\)</small></th>
+                    <td>Direct attack success \(\downarrow\)</td>
+                    <td>\(46.0\%\)</td>
+                    <td>\(39.3\% \pm 4.5\,\text{pp}\)</td>
                   </tr>
                   <tr>
-                    <td>Benign task completion ↑</td>
-                    <td>35.0%</td>
-                    <td>39.0% ± 1.7 pp</td>
+                    <td>Benign task completion \(\uparrow\)</td>
+                    <td>\(35.0\%\)</td>
+                    <td>\(39.0\% \pm 1.7\,\text{pp}\)</td>
                   </tr>
                   <tr>
                     <th scope="row">
-                      Composed workflow <small>Qwen3-4B · p01</small>
+                      Composed workflow <small>Qwen3-4B · \(p_{01}\)</small>
                     </th>
-                    <td>Mean failure rate ↓</td>
-                    <td>0.099</td>
-                    <td>0.090 ± 0.006</td>
+                    <td>Mean failure rate \(\downarrow\)</td>
+                    <td>\(0.099\)</td>
+                    <td>\(0.090 \pm 0.006\)</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <p class="evaluation-note">
-              LatentShield values are mean ± standard deviation across three
+              LatentShield values are mean \(\pm\) standard deviation across three
               training seeds. The composed-workflow baseline has no monitor.
             </p>
           </div>

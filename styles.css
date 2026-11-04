@@ -862,7 +862,7 @@ select {
   text-align: right;
   padding-bottom: 4px;
 }
-.metric-key span {
+.metric-key > span {
   display: block;
   font-size: 11px;
   margin-top: 4px;
@@ -1569,7 +1569,7 @@ dialog p {
     align-items: center;
     font-size: 10px;
   }
-  .metric-key span {
+  .metric-key > span {
     font-size: 10px;
     margin: 0;
   }
@@ -1797,4 +1797,14 @@ dialog p {
   .evaluation-table td:nth-last-child(-n+2) {
     width: 22%;
   }
+}
+
+.katex {
+  font-size: 1.05em;
+}
+strong .katex,
+th .katex,
+h3 .katex,
+h4 .katex {
+  font-weight: 700;
 }

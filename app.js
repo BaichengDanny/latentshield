@@ -22,6 +22,22 @@ resources.forEach((resource) => {
       `<${tag} class="resource-button" ${attrs}>${icon(resource.icon)}${resource.label}</${tag}>`,
     );
 });
+const typeset = (el) =>
+  window.renderMathInElement?.(el, {
+    delimiters: [
+      { left: "\\(", right: "\\)", display: false },
+      { left: "\\[", right: "\\]", display: true },
+    ],
+    throwOnError: false,
+  });
+// Re-typeset only when content changes; the demo calls this every animation frame.
+function setMath(el, source) {
+  if (el.dataset.tex === source) return;
+  el.dataset.tex = source;
+  el.textContent = source;
+  typeset(el);
+}
+const plain = (source) => source.replace(/\\\(|\\\)/g, "");
 let toastTimeout;
 function toast(message) {
   const el = document.querySelector("#toast");
@@ -48,28 +64,28 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const phases = [
   {
     duration: 1300,
-    label: "MDU 1 · Input",
+    label: "MDU \\(1\\) · Input",
     paths: ["flow-input"],
     nodes: ["agent-1"],
-    text: "A token query enters MDU 1.",
+    text: "A token query enters MDU \\(1\\).",
   },
   {
     duration: 2300,
-    label: "MDU 1 · Collaborate",
+    label: "MDU \\(1\\) · Collaborate",
     paths: ["flow-collab-1"],
     nodes: ["agent-1", "agent-2", "agent-3"],
     text: "The first MDU’s contributors exchange latent representations.",
   },
   {
     duration: 2400,
-    label: "MDU 1 · Monitor",
+    label: "MDU \\(1\\) · Monitor",
     paths: ["flow-monitor-1"],
     nodes: ["shield-1"],
     text: "The contributor latent trajectory flows into LatentShield for risk assessment.",
   },
   {
     duration: 2100,
-    label: "MDU 1 · Decide",
+    label: "MDU \\(1\\) · Decide",
     paths: ["flow-control-1", "flow-context-1"],
     nodes: ["shield-1", "decision-1"],
     text: "LatentShield adds a safety instruction before the decision node generates its token output.",
@@ -84,28 +100,28 @@ const phases = [
   },
   {
     duration: 1400,
-    label: "MDU 2 · Input",
+    label: "MDU \\(2\\) · Input",
     paths: ["flow-branch-top", "flow-branch-bottom"],
     nodes: ["agent-4", "agent-5"],
     text: "The token handoff becomes input to the second MDU’s parallel contributors.",
   },
   {
     duration: 2100,
-    label: "MDU 2 · Collaborate",
+    label: "MDU \\(2\\) · Collaborate",
     paths: ["flow-join-top", "flow-join-bottom"],
     nodes: ["agent-4", "agent-5", "agent-6"],
     text: "Parallel agents collaborate in latent space, forming a new contributor trajectory.",
   },
   {
     duration: 2400,
-    label: "MDU 2 · Monitor",
+    label: "MDU \\(2\\) · Monitor",
     paths: ["flow-monitor-2"],
     nodes: ["shield-2"],
     text: "The second MDU’s trajectory flows through its own LatentShield check.",
   },
   {
     duration: 2100,
-    label: "MDU 2 · Decide",
+    label: "MDU \\(2\\) · Decide",
     paths: ["flow-control-2", "flow-context-2"],
     nodes: ["shield-2", "decision-2"],
     text: "A safety instruction reaches the second decision node before output generation.",
@@ -190,10 +206,12 @@ function drawTimeline() {
     phase.nodes.forEach((id) =>
       document.getElementById(id).classList.add("node-active"),
     );
-    document.querySelector("#phase-label").textContent = phase.label;
+    setMath(document.querySelector("#phase-label"), phase.label);
   }
-  document.querySelector("#step-description").textContent =
-    demo.dataset.risk === "low" && phase.low ? phase.low : phase.text;
+  setMath(
+    document.querySelector("#step-description"),
+    demo.dataset.risk === "low" && phase.low ? phase.low : phase.text,
+  );
   activePaths.forEach((id) => {
     const { motionPath, packet, length } = pathCache.get(id),
       position = motionPath.getPointAtLength(length * fraction);
@@ -204,7 +222,7 @@ function drawTimeline() {
   progressInput.value = String(Math.round((elapsed / totalDuration) * 1000));
   progressInput.setAttribute(
     "aria-valuetext",
-    `${phase.label}: ${Math.round((elapsed / totalDuration) * 100)}%`,
+    `${plain(phase.label)}: ${Math.round((elapsed / totalDuration) * 100)}%`,
   );
 }
 function frame(now) {
@@ -328,13 +346,17 @@ const operatingPoints = {
 };
 const chart = document.querySelector("#result-chart");
 const fixed = (value) => value.toFixed(3);
+const tex = (body) => `\\(${body}\\)`;
+const num = (value) => tex(fixed(value));
+const pm = (value, sd) => tex(`${fixed(value)} \\pm ${fixed(sd)}`);
+const point = (name) => tex(`p_{${name.slice(1)}}`);
 function renderResults() {
   const model = Number(document.querySelector("#model-select").value);
-  const point = document.querySelector("#point-select").value;
-  const current = operatingPoints[point];
+  const pointName = document.querySelector("#point-select").value;
+  const current = operatingPoints[pointName];
   const rows = [
     ...baselines,
-    { name: `LatentShield · ${point}`, ...current, ours: true },
+    { name: `LatentShield · ${point(pointName)}`, ...current, ours: true },
   ];
   const max =
     Math.ceil(
@@ -344,16 +366,18 @@ function renderResults() {
     rows
       .map(
         (row) =>
-          `<div class="chart-row ${row.ours ? "ours" : ""}"><span class="chart-label">${row.name}</span><div class="chart-track"><div class="chart-bar" style="width:${(row.values[model] / max) * 100}%"></div></div><span class="chart-value">${fixed(row.values[model])}${row.sd ? ` <small>± ${fixed(row.sd[model])}</small>` : ""}</span></div>`,
+          `<div class="chart-row ${row.ours ? "ours" : ""}"><span class="chart-label">${row.name}</span><div class="chart-track"><div class="chart-bar" style="width:${(row.values[model] / max) * 100}%"></div></div><span class="chart-value">${num(row.values[model])}${row.sd ? ` <small>${tex(`\\pm ${fixed(row.sd[model])}`)}</small>` : ""}</span></div>`,
       )
       .join("") +
-    `<div class="chart-axis">${Array.from({ length: 6 }, (_, i) => `<span>${((max * i) / 5).toFixed(2)}</span>`).join("")}</div>`;
+    `<div class="chart-axis">${Array.from({ length: 6 }, (_, i) => `<span>${tex(((max * i) / 5).toFixed(2))}</span>`).join("")}</div>`;
   const relative =
     ((baselines[0].values[model] - current.values[model]) /
       baselines[0].values[model]) *
     100;
   document.querySelector("#result-summary").innerHTML =
-    `<strong>${Math.abs(relative).toFixed(1)}% ${relative >= 0 ? "lower" : "higher"} MFR</strong> relative to unguarded LatentMAS · ${models[model]} · ${point}.`;
+    `<strong>${tex(`${Math.abs(relative).toFixed(1)}\\%`)} ${relative >= 0 ? "lower" : "higher"} MFR</strong> relative to unguarded LatentMAS · ${models[model]} · ${point(pointName)}.`;
+  typeset(chart);
+  typeset(document.querySelector("#result-summary"));
 }
 document
   .querySelector("#model-select")
@@ -365,13 +389,13 @@ renderResults();
 const table = document.querySelector("#full-results-table");
 table.insertAdjacentHTML(
   "beforeend",
-  `<thead><tr><th scope="col">Method</th>${models.map((m) => `<th scope="col">${m}</th>`).join("")}</tr></thead><tbody>${[...baselines, ...Object.entries(operatingPoints).map(([point, values]) => ({ name: `LatentShield (${point})`, ...values, ours: true }))].map((row) => `<tr class="${row.ours ? "ours" : ""}"><th scope="row">${row.name}</th>${row.values.map((v, i) => `<td>${fixed(v)}${row.sd ? ` ± ${fixed(row.sd[i])}` : ""}</td>`).join("")}</tr>`).join("")}</tbody>`,
+  `<thead><tr><th scope="col">Method</th>${models.map((m) => `<th scope="col">${m}</th>`).join("")}</tr></thead><tbody>${[...baselines, ...Object.entries(operatingPoints).map(([point_, values]) => ({ name: `LatentShield (${point(point_)})`, ...values, ours: true }))].map((row) => `<tr class="${row.ours ? "ours" : ""}"><th scope="row">${row.name}</th>${row.values.map((v, i) => `<td>${row.sd ? pm(v, row.sd[i]) : num(v)}</td>`).join("")}</tr>`).join("")}</tbody>`,
 );
 
 // Edges follow the provided topology figure exactly, including the twin-chain skip edges.
 const topologies = {
   fuse: {
-    name: "Fuse-CD · 5 agents",
+    name: "Fuse-CD · \\(5\\) agents",
     base: 0.19,
     ours: 0.093,
     nodes: [
@@ -389,7 +413,7 @@ const topologies = {
     ],
   },
   wide: {
-    name: "Wide fan-out · 5 agents",
+    name: "Wide fan-out · \\(5\\) agents",
     base: 0.162,
     ours: 0.094,
     nodes: [
@@ -409,7 +433,7 @@ const topologies = {
     ],
   },
   tree: {
-    name: "Tree · 6 agents",
+    name: "Tree · \\(6\\) agents",
     base: 0.181,
     ours: 0.096,
     nodes: [
@@ -430,7 +454,7 @@ const topologies = {
     ],
   },
   twin: {
-    name: "Twin chains · 6 agents",
+    name: "Twin chains · \\(6\\) agents",
     base: 0.176,
     ours: 0.097,
     nodes: [
@@ -453,7 +477,7 @@ const topologies = {
     ],
   },
   fan: {
-    name: "Fan-out + fuse · 6 agents",
+    name: "Fan-out + fuse · \\(6\\) agents",
     base: 0.186,
     ours: 0.117,
     nodes: [
@@ -475,7 +499,7 @@ const topologies = {
     ],
   },
   nine: {
-    name: "9-agent fuse · 9 agents",
+    name: "\\(9\\)-agent fuse · \\(9\\) agents",
     base: 0.185,
     ours: 0.09,
     nodes: [
@@ -506,7 +530,7 @@ function renderTopology() {
   const svg = document.querySelector("#topology-svg");
   svg.setAttribute(
     "aria-label",
-    `${selected.name}. Contributors communicate in latent space before a monitored decision node.`,
+    `${plain(selected.name)}. Contributors communicate in latent space before a monitored decision node.`,
   );
   const edges = selected.edges
     .map(([a, b, curve]) => {
@@ -524,25 +548,25 @@ function renderTopology() {
     })
     .join("");
   svg.innerHTML = `<defs><marker id="topo-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 6 3 0 6" fill="none" stroke="#83a0bb"/></marker></defs><line x1="468" y1="16" x2="468" y2="264" stroke="#c49b6d" stroke-dasharray="4 5"/>${edges}${selected.nodes.map(([x, y], i) => `<g class="${i === selected.nodes.length - 1 ? "topo-decision" : ""}"><circle cx="${x}" cy="${y}" r="21" fill="${i === selected.nodes.length - 1 ? "#168b8d" : "#edf4fa"}" stroke="${i === selected.nodes.length - 1 ? "#168b8d" : "#b0c6dc"}" stroke-width="1.4"/><text x="${x}" y="${y + 5}" text-anchor="middle">${i === selected.nodes.length - 1 ? "D" : i + 1}</text></g>`).join("")}`;
-  document.querySelector("#topology-name").textContent = selected.name;
-  document.querySelector("#topology-base").textContent = fixed(selected.base);
-  document.querySelector("#topology-ours").textContent = fixed(selected.ours);
+  setMath(document.querySelector("#topology-name"), selected.name);
+  setMath(document.querySelector("#topology-base"), num(selected.base));
+  setMath(document.querySelector("#topology-ours"), num(selected.ours));
 }
 document
   .querySelector("#topology-select")
   .addEventListener("change", renderTopology);
 renderTopology();
 document.querySelector("#topology-table").innerHTML =
-  `<caption>Qwen3-4B structural transfer. Fixed source-validation p10 threshold; LatentShield means across three monitors.</caption><thead><tr><th scope="col">Unseen structure</th><th scope="col">LatentMAS MFR ↓</th><th scope="col">LatentShield MFR ↓</th></tr></thead><tbody>${Object.values(
+  `<caption>Qwen3-4B structural transfer. Fixed source-validation ${point("p10")} threshold; LatentShield means across three monitors.</caption><thead><tr><th scope="col">Unseen structure</th><th scope="col">LatentMAS MFR ${tex("\\downarrow")}</th><th scope="col">LatentShield MFR ${tex("\\downarrow")}</th></tr></thead><tbody>${Object.values(
     topologies,
   )
     .map(
       (t) =>
-        `<tr><th scope="row">${t.name}</th><td>${fixed(t.base)}</td><td>${fixed(t.ours)}</td></tr>`,
+        `<tr><th scope="row">${t.name}</th><td>${num(t.base)}</td><td>${num(t.ours)}</td></tr>`,
     )
     .join(
       "",
-    )}<tr class="ours"><th scope="row">Average</th><td>0.180</td><td>0.098</td></tr></tbody>`;
+    )}<tr class="ours"><th scope="row">Average</th><td>${num(0.18)}</td><td>${num(0.098)}</td></tr></tbody>`;
 
 const citation = `@misc{chen2026latentshield,
   title = {LatentShield: Composable Latent Multi-Agent Systems with Decision-Boundary Monitoring},
@@ -635,5 +659,6 @@ walkthroughVideos.forEach((video) => videoVisibility.observe(video));
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) walkthroughVideos.forEach((video) => video.pause());
 });
-document.querySelector("#full-abstract").textContent =
-  "Latent communication lets language-model agents exchange continuous representations directly, but removes the textual handoffs inspected by conventional text-based monitors. We introduce LatentShield, which combines a two-scale communication architecture with safety monitoring at decision boundaries. Rather than propagate latent states through an entire agent graph, we partition the workflow into Multi-Agent Decision Units (MDUs): agents communicate in latent space within each MDU, while only token-space messages cross MDU boundaries. Each MDU ends at a designated decision node. Immediately before that node generates the unit’s token output, LatentShield reads the contributor latent trajectory and predicts the risk of harmful compliance. A trainable readout applies learned-query attention to pool the variable-length trajectory and uses an MLP aligner to map the pooled representation into the hidden space of a frozen Llama Guard, without decoding the intermediate communication to text. If the risk score exceeds a validation-selected threshold, LatentShield adds a safety instruction before generation. Across the five backbones, LatentShield achieves the lowest mean failure rate among the evaluated latent-monitoring methods while retaining competitive benign utility overall. On Qwen3-4B, it reduces mean failure rate by 36.2% relative to unguarded LatentMAS. A monitor trained on one MDU structure also transfers without retraining to the evaluated unseen MDU sizes and communication graphs. We further evaluate adaptive prompt-injection attacks and agentic workflows. Together, these results support decision-boundary monitoring as a practical safety interface for latent multi-agent systems.";
+setMath(document.querySelector("#full-abstract"),
+  "Latent communication lets language-model agents exchange continuous representations directly, but removes the textual handoffs inspected by conventional text-based monitors. We introduce LatentShield, which combines a two-scale communication architecture with safety monitoring at decision boundaries. Rather than propagate latent states through an entire agent graph, we partition the workflow into Multi-Agent Decision Units (MDUs): agents communicate in latent space within each MDU, while only token-space messages cross MDU boundaries. Each MDU ends at a designated decision node. Immediately before that node generates the unit’s token output, LatentShield reads the contributor latent trajectory and predicts the risk of harmful compliance. A trainable readout applies learned-query attention to pool the variable-length trajectory and uses an MLP aligner to map the pooled representation into the hidden space of a frozen Llama Guard, without decoding the intermediate communication to text. If the risk score exceeds a validation-selected threshold, LatentShield adds a safety instruction before generation. Across the five backbones, LatentShield achieves the lowest mean failure rate among the evaluated latent-monitoring methods while retaining competitive benign utility overall. On Qwen3-4B, it reduces mean failure rate by \\(36.2\\%\\) relative to unguarded LatentMAS. A monitor trained on one MDU structure also transfers without retraining to the evaluated unseen MDU sizes and communication graphs. We further evaluate adaptive prompt-injection attacks and agentic workflows. Together, these results support decision-boundary monitoring as a practical safety interface for latent multi-agent systems.");
+typeset(document.body);
