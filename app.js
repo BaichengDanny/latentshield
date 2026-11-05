@@ -37,6 +37,22 @@ function setMath(el, source) {
   el.textContent = source;
   typeset(el);
 }
+// Adds .in-view once the element scrolls into view; CSS runs the entrance animation.
+function revealOnScroll(el) {
+  if (reducedMotion.matches || !("IntersectionObserver" in window)) {
+    el.classList.add("in-view");
+    return;
+  }
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries[0].isIntersecting) return;
+      el.classList.add("in-view");
+      observer.disconnect();
+    },
+    { threshold: 0.35 },
+  );
+  observer.observe(el);
+}
 const plain = (source) => source.replace(/\\\(|\\\)/g, "");
 let toastTimeout;
 function toast(message) {
@@ -365,8 +381,8 @@ function renderResults() {
   chart.innerHTML =
     rows
       .map(
-        (row) =>
-          `<div class="chart-row ${row.ours ? "ours" : ""}"><span class="chart-label">${row.name}</span><div class="chart-track"><div class="chart-bar" style="width:${(row.values[model] / max) * 100}%"></div></div><span class="chart-value">${num(row.values[model])}${row.sd ? ` <small>${tex(`\\pm ${fixed(row.sd[model])}`)}</small>` : ""}</span></div>`,
+        (row, i) =>
+          `<div class="chart-row ${row.ours ? "ours" : ""}" style="--i:${i}"><span class="chart-label">${row.name}</span><div class="chart-track"><div class="chart-bar" style="width:0" data-width="${(row.values[model] / max) * 100}%"></div></div><span class="chart-value">${num(row.values[model])}${row.sd ? ` <small>${tex(`\\pm ${fixed(row.sd[model])}`)}</small>` : ""}</span></div>`,
       )
       .join("") +
     `<div class="chart-axis">${Array.from({ length: 6 }, (_, i) => `<span>${tex(((max * i) / 5).toFixed(2))}</span>`).join("")}</div>`;
@@ -378,6 +394,11 @@ function renderResults() {
     `<strong>${tex(`${Math.abs(relative).toFixed(1)}\\%`)} ${relative >= 0 ? "lower" : "higher"} MFR</strong> relative to unguarded LatentMAS · ${models[model]} · ${point(pointName)}.`;
   typeset(chart);
   typeset(document.querySelector("#result-summary"));
+  // Bars are inserted at zero width so each render grows them in.
+  chart.offsetWidth;
+  chart
+    .querySelectorAll(".chart-bar")
+    .forEach((bar) => (bar.style.width = bar.dataset.width));
 }
 document
   .querySelector("#model-select")
@@ -386,6 +407,133 @@ document
   .querySelector("#point-select")
   .addEventListener("change", renderResults);
 renderResults();
+revealOnScroll(chart);
+
+// Source: paper-source/tables/utility_*.tex. LatentShield uses the best
+// operating point per benchmark, as in the paper figure; sd is across seeds.
+const utilityMethods = [
+  { key: "textmas", name: "TextMAS", shape: "circle", color: "#9fb7d6", dy: 14 },
+  { key: "latentmas", name: "LatentMAS", shape: "circle", color: "#c8a57c", dy: 8 },
+  { key: "textcot", name: "TextMAS + CoT Guard", shape: "square", color: "#5b84b8", dy: 2 },
+  { key: "backbone", name: "LatentMAS + Backbone Guard", shape: "square", color: "#a47c55", dy: -4 },
+  { key: "latentcot", name: "LatentMAS + CoT Guard", shape: "diamond", color: "#a493c0", dy: -10 },
+  { key: "shield", name: "LatentShield", shape: "circle", color: "#168b8d", dy: -15, size: 8 },
+];
+const utilityData = [
+  {
+    model: "Qwen3-4B",
+    textmas: [0.364, 0.752],
+    latentmas: [0.298, 0.716],
+    textcot: [0.369, 0.755],
+    backbone: [0.354, 0.729],
+    latentcot: [0.318, 0.707],
+    shield: [[0.362, 0.03, "p50"], [0.724, 0.01, "p20"]],
+  },
+  {
+    model: "Qwen3-4B-Instruct",
+    textmas: [0.5, 0.768],
+    latentmas: [0.308, 0.71],
+    textcot: [0.51, 0.776],
+    backbone: [0.328, 0.721],
+    latentcot: [0.313, 0.707],
+    shield: [[0.343, 0.018, "p20"], [0.759, 0.034, "p10"]],
+  },
+  {
+    model: "Qwen3-14B",
+    textmas: [0.505, 0.805],
+    latentmas: [0.348, 0.742],
+    textcot: [0.51, 0.805],
+    backbone: [0.364, 0.777],
+    latentcot: [0.348, 0.749],
+    shield: [[0.434, 0.013, "p20"], [0.79, 0.001, "p50"]],
+  },
+  {
+    model: "Gemma-2-2B-IT",
+    textmas: [0.258, 0.321],
+    latentmas: [0.167, 0.12],
+    textcot: [0.253, 0.33],
+    backbone: [0.152, 0.119],
+    latentcot: [0.152, 0.131],
+    shield: [[0.19, 0.015, "p50"], [0.123, 0.001, "p50"]],
+  },
+  {
+    model: "Phi-3-mini-4K-Instruct",
+    textmas: [0.323, 0.448],
+    latentmas: [0.359, 0.49],
+    textcot: [0.288, 0.454],
+    backbone: [0.278, 0.42],
+    latentcot: [0.263, 0.488],
+    shield: [[0.316, 0.025, "p50"], [0.498, 0.002, "p20"]],
+  },
+];
+const utilityPanels = [
+  { name: "GPQA-Diamond", x0: 185, x1: 565, min: 0.12, max: 0.56, ticks: [0.15, 0.25, 0.35, 0.45, 0.55], digits: 2 },
+  { name: "MMLU-Pro", x0: 615, x1: 990, min: -0.02, max: 0.84, ticks: [0, 0.2, 0.4, 0.6, 0.8], digits: 1 },
+];
+const markerShape = ({ shape, color, size = 6 }) =>
+  shape === "square"
+    ? `<rect x="${-size + 0.5}" y="${-size + 0.5}" width="${2 * size - 1}" height="${2 * size - 1}" fill="${color}"/>`
+    : shape === "diamond"
+      ? `<path d="M0 ${-size * 1.3}L${size * 1.3} 0 0 ${size * 1.3}${-size * 1.3} 0Z" fill="${color}"/>`
+      : `<circle r="${size}" fill="${color}"/>`;
+function renderUtility() {
+  const top = 44,
+    rowHeight = 62,
+    bottom = top + rowHeight * utilityData.length;
+  const svg = document.querySelector("#utility-svg");
+  let out = "";
+  utilityPanels.forEach((panel, p) => {
+    const scale = (panel.x1 - panel.x0) / (panel.max - panel.min);
+    const xOf = (v) => panel.x0 + (v - panel.min) * scale;
+    out += `<text class="u-title" x="${(panel.x0 + panel.x1) / 2}" y="24" text-anchor="middle">${panel.name}</text>`;
+    out += panel.ticks
+      .map(
+        (t) =>
+          `<line class="u-grid" x1="${xOf(t)}" x2="${xOf(t)}" y1="${top}" y2="${bottom}"/><text class="u-tick" x="${xOf(t)}" y="${bottom + 22}" text-anchor="middle">${t.toFixed(panel.digits)}</text>`,
+      )
+      .join("");
+    out += `<line class="u-axis" x1="${panel.x0}" x2="${panel.x1}" y1="${bottom}" y2="${bottom}"/><line class="u-axis" x1="${panel.x0}" x2="${panel.x0}" y1="${top}" y2="${bottom}"/>`;
+    out += `<text class="u-axis-label" x="${(panel.x0 + panel.x1) / 2}" y="${bottom + 50}" text-anchor="middle">Accuracy ↑</text>`;
+    utilityData.forEach((row, r) => {
+      const y = top + rowHeight * (r + 0.5);
+      if (p === 0)
+        out += `<text class="u-row-label" x="${panel.x0 - 18}" y="${y + 5}" text-anchor="end">${row.model}</text>`;
+      utilityMethods.forEach((method, m) => {
+        const entry = row[method.key][p];
+        const [value, sd, op] = Array.isArray(entry) ? entry : [entry];
+        const x = xOf(value),
+          delay = p * 120 + r * 110 + m * 45;
+        const label = `${row.model} · ${method.name}${op ? ` (${op})` : ""}: ${value.toFixed(3)}${sd ? ` ± ${sd.toFixed(3)}` : ""}`;
+        const halfWidth = (sd || 0) * scale;
+        const errorBar = sd
+          ? `<g class="u-err" style="--d:${delay}ms"><path d="M${-halfWidth} 0H${halfWidth}M${-halfWidth} -4V4M${halfWidth} -4V4"/></g>`
+          : "";
+        out += `<g class="u-mark" data-method="${method.key}" transform="translate(${x} ${y + method.dy})"><title>${label}</title>${errorBar}<g class="u-dot" style="--from:${panel.x0 - x}px;--d:${delay}ms">${markerShape(method)}</g></g>`;
+      });
+    });
+  });
+  svg.innerHTML = out;
+  document.querySelector("#utility-legend").innerHTML = [...utilityMethods]
+    .reverse()
+    .map(
+      (method) =>
+        `<span data-method="${method.key}"><svg viewBox="-9 -9 18 18" aria-hidden="true">${markerShape({ ...method, size: method.size ? 7 : 6 })}</svg>${method.name}</span>`,
+    )
+    .join("");
+  document.querySelectorAll("#utility-legend span").forEach((item) => {
+    item.addEventListener("mouseenter", () => {
+      svg.classList.add("focus");
+      svg
+        .querySelectorAll(".u-mark")
+        .forEach((mark) =>
+          mark.classList.toggle("focused", mark.dataset.method === item.dataset.method),
+        );
+    });
+    item.addEventListener("mouseleave", () => svg.classList.remove("focus"));
+  });
+}
+renderUtility();
+revealOnScroll(document.querySelector("#utility-chart"));
 const table = document.querySelector("#full-results-table");
 table.insertAdjacentHTML(
   "beforeend",
@@ -525,12 +673,54 @@ const topologies = {
     ],
   },
 };
+const topoStep = 900,
+  topoHold = 1400;
+let topoFlow = null,
+  topoElapsed = 0,
+  topoLast = null,
+  topoFrameId = null,
+  topoVisible = false;
+function drawTopologyFlow() {
+  const t = topoElapsed;
+  topoFlow.edges.forEach(({ el, packet, length, start, span }) => {
+    const progress = (t - start) / span,
+      moving = progress > 0 && progress < 1;
+    el.classList.toggle("flowing", moving);
+    el.classList.toggle("done", progress >= 1);
+    packet.style.display = moving ? "" : "none";
+    if (moving) {
+      const point = el.getPointAtLength(length * progress);
+      packet.setAttribute("cx", point.x);
+      packet.setAttribute("cy", point.y);
+    }
+  });
+  topoFlow.nodes.forEach(({ el, at }) => el.classList.toggle("lit", t >= at));
+}
+function topologyFrame(now) {
+  if (topoLast !== null)
+    topoElapsed = (topoElapsed + Math.min(now - topoLast, 100)) % topoFlow.total;
+  topoLast = now;
+  drawTopologyFlow();
+  topoFrameId = requestAnimationFrame(topologyFrame);
+}
+function updateTopologyPlayback() {
+  if (topoFrameId !== null) cancelAnimationFrame(topoFrameId);
+  topoFrameId = null;
+  topoLast = null;
+  if (topoVisible && !document.hidden && !reducedMotion.matches)
+    topoFrameId = requestAnimationFrame(topologyFrame);
+}
 function renderTopology() {
   const selected = topologies[document.querySelector("#topology-select").value];
   const svg = document.querySelector("#topology-svg");
   svg.setAttribute(
     "aria-label",
     `${plain(selected.name)}. Contributors communicate in latent space before a monitored decision node.`,
+  );
+  // Depth = longest path from a source, so every packet reaching a node arrives together.
+  const depth = selected.nodes.map(() => 0);
+  selected.edges.forEach(() =>
+    selected.edges.forEach(([a, b]) => (depth[b] = Math.max(depth[b], depth[a] + 1))),
   );
   const edges = selected.edges
     .map(([a, b, curve]) => {
@@ -544,10 +734,28 @@ function renderTopology() {
       const path = curve
         ? `M${startX} ${startY} Q${(x1 + x2) / 2} ${curve === "top" ? -35 : 315} ${endX} ${endY}`
         : `M${startX} ${startY}L${endX} ${endY}`;
-      return `<path d="${path}" fill="none" stroke="#83a0bb" stroke-width="1.5" marker-end="url(#topo-arrow)"/>`;
+      return `<path class="topo-edge" data-from="${a}" data-to="${b}" d="${path}" fill="none" stroke="#83a0bb" stroke-width="1.5" marker-end="url(#topo-arrow)"/>`;
     })
     .join("");
-  svg.innerHTML = `<defs><marker id="topo-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 6 3 0 6" fill="none" stroke="#83a0bb"/></marker></defs><line x1="468" y1="16" x2="468" y2="264" stroke="#c49b6d" stroke-dasharray="4 5"/>${edges}${selected.nodes.map(([x, y], i) => `<g class="${i === selected.nodes.length - 1 ? "topo-decision" : ""}"><circle cx="${x}" cy="${y}" r="21" fill="${i === selected.nodes.length - 1 ? "#168b8d" : "#edf4fa"}" stroke="${i === selected.nodes.length - 1 ? "#168b8d" : "#b0c6dc"}" stroke-width="1.4"/><text x="${x}" y="${y + 5}" text-anchor="middle">${i === selected.nodes.length - 1 ? "D" : i + 1}</text></g>`).join("")}`;
+  const last = selected.nodes.length - 1;
+  svg.innerHTML = `<defs><marker id="topo-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 6 3 0 6" fill="none" stroke="#83a0bb"/></marker></defs><line x1="468" y1="16" x2="468" y2="264" stroke="#c49b6d" stroke-dasharray="4 5"/>${edges}<g class="topo-packets"></g>${selected.nodes.map(([x, y], i) => `<g class="topo-node ${i === last ? "topo-decision" : ""}" data-depth="${depth[i]}">${i === last ? `<circle class="topo-ring" cx="${x}" cy="${y}" r="21"/>` : ""}<circle cx="${x}" cy="${y}" r="21" fill="${i === last ? "#168b8d" : "#edf4fa"}" stroke="${i === last ? "#168b8d" : "#b0c6dc"}" stroke-width="1.4"/><text x="${x}" y="${y + 5}" text-anchor="middle">${i === last ? "D" : i + 1}</text></g>`).join("")}`;
+  const packetLayer = svg.querySelector(".topo-packets");
+  topoFlow = {
+    edges: [...svg.querySelectorAll(".topo-edge")].map((el) => {
+      const from = depth[el.dataset.from],
+        to = depth[el.dataset.to];
+      const packet = document.createElementNS(svgNS, "circle");
+      packet.setAttribute("r", "5");
+      packet.setAttribute("class", "packet latent-packet");
+      packet.style.display = "none";
+      packetLayer.append(packet);
+      return { el, packet, length: el.getTotalLength(), start: from * topoStep, span: (to - from) * topoStep };
+    }),
+    nodes: [...svg.querySelectorAll(".topo-node")].map((el) => ({ el, at: Number(el.dataset.depth) * topoStep })),
+    total: depth[last] * topoStep + topoHold,
+  };
+  topoElapsed = reducedMotion.matches ? topoFlow.total - 1 : 0;
+  drawTopologyFlow();
   setMath(document.querySelector("#topology-name"), selected.name);
   setMath(document.querySelector("#topology-base"), num(selected.base));
   setMath(document.querySelector("#topology-ours"), num(selected.ours));
@@ -556,8 +764,21 @@ document
   .querySelector("#topology-select")
   .addEventListener("change", renderTopology);
 renderTopology();
+new IntersectionObserver(
+  (entries) => {
+    topoVisible = entries[0].isIntersecting;
+    updateTopologyPlayback();
+  },
+  { threshold: 0.3 },
+).observe(document.querySelector("#topology-svg"));
+document.addEventListener("visibilitychange", updateTopologyPlayback);
+reducedMotion.addEventListener("change", () => {
+  if (reducedMotion.matches) topoElapsed = topoFlow.total - 1;
+  drawTopologyFlow();
+  updateTopologyPlayback();
+});
 document.querySelector("#topology-table").innerHTML =
-  `<caption>Qwen3-4B structural transfer. Fixed source-validation ${point("p10")} threshold; LatentShield means across three monitors.</caption><thead><tr><th scope="col">Unseen structure</th><th scope="col">LatentMAS MFR ${tex("\\downarrow")}</th><th scope="col">LatentShield MFR ${tex("\\downarrow")}</th></tr></thead><tbody>${Object.values(
+  `<thead><tr><th scope="col">Unseen structure</th><th scope="col">LatentMAS MFR ${tex("\\downarrow")}</th><th scope="col">LatentShield MFR ${tex("\\downarrow")}</th></tr></thead><tbody>${Object.values(
     topologies,
   )
     .map(
@@ -600,8 +821,6 @@ document.querySelectorAll(".figure-zoom").forEach((button) =>
   button.addEventListener("click", () => {
     document.querySelector("#dialog-image").src = button.dataset.image;
     document.querySelector("#dialog-image").alt = button.dataset.caption;
-    document.querySelector("#dialog-caption").textContent =
-      button.dataset.caption;
     dialog.showModal();
   }),
 );

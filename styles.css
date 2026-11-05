@@ -893,7 +893,17 @@ select {
 .chart-bar {
   height: 100%;
   background: #c5cbd0;
-  transition: width 0.5s;
+  transition: width 0.9s cubic-bezier(0.2, 0.75, 0.25, 1)
+    calc(var(--i, 0) * 90ms);
+}
+.result-chart:not(.in-view) .chart-bar {
+  width: 0 !important;
+}
+.result-chart .chart-value {
+  transition: opacity 0.4s ease calc(var(--i, 0) * 90ms + 0.45s);
+}
+.result-chart:not(.in-view) .chart-value {
+  opacity: 0;
 }
 .chart-row:nth-child(2) .chart-bar {
   background: #cfc0d2;
@@ -1031,9 +1041,102 @@ tbody tr.ours {
   margin: auto;
   color: #56616a;
 }
-.utility-block .paper-figure {
+.utility-chart {
   max-width: 1000px;
-  margin: 25px auto;
+  margin: 28px auto 25px;
+}
+.utility-scroll {
+  overflow-x: auto;
+}
+#utility-svg {
+  display: block;
+  width: 100%;
+  min-width: 680px;
+  height: auto;
+}
+.u-grid {
+  stroke: #e3e7ea;
+}
+.u-axis {
+  stroke: #b9c1c7;
+}
+.u-title {
+  font-size: 16px;
+  font-weight: 700;
+  fill: var(--ink);
+}
+.u-row-label,
+.u-tick,
+.u-axis-label {
+  font-size: 13px;
+  fill: #56616a;
+}
+.u-axis-label {
+  font-size: 14px;
+}
+.u-mark {
+  transition: opacity 0.2s;
+}
+#utility-svg.focus .u-mark:not(.focused) {
+  opacity: 0.12;
+}
+.u-dot {
+  opacity: 0;
+  transform: translateX(var(--from));
+  transition:
+    transform 0.9s cubic-bezier(0.2, 0.75, 0.25, 1) var(--d),
+    opacity 0.35s ease var(--d);
+}
+.u-dot > * {
+  stroke: #fff;
+  stroke-width: 1.2;
+}
+.u-mark:hover .u-dot > * {
+  stroke: var(--ink);
+  stroke-width: 1.6;
+}
+.u-err {
+  fill: none;
+  stroke: #168b8d;
+  stroke-width: 1.6;
+  transform: scaleX(0);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.45s ease calc(var(--d) + 0.75s);
+}
+.utility-chart.in-view .u-dot {
+  opacity: 1;
+  transform: none;
+}
+.utility-chart.in-view .u-err {
+  transform: none;
+}
+.utility-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: #56616a;
+}
+.utility-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: default;
+}
+.utility-legend svg {
+  width: 15px;
+  height: 15px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chart-bar,
+  .result-chart .chart-value,
+  .u-dot,
+  .u-err {
+    transition: none;
+  }
 }
 .topology-explorer {
   display: grid;
@@ -1148,6 +1251,51 @@ tbody tr.ours {
 }
 #topology-svg .topo-decision text {
   fill: white;
+}
+.topo-edge {
+  transition: stroke 0.3s;
+}
+.topo-edge.flowing {
+  stroke: #4678c3;
+  stroke-width: 2;
+}
+.topo-edge.done {
+  stroke: #9db6d8;
+}
+.topo-node circle {
+  transition:
+    fill 0.3s,
+    stroke 0.3s;
+}
+.topo-node.lit:not(.topo-decision) circle {
+  fill: #dce8f7;
+  stroke: #4678c3;
+}
+.topo-ring {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.topo-decision.lit .topo-ring {
+  animation: topo-ring 1.2s ease-out;
+}
+@keyframes topo-ring {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .topo-decision.lit .topo-ring {
+    animation: none;
+  }
 }
 .transfer-summary {
   font-size: 14px;
@@ -1627,7 +1775,7 @@ dialog p {
   .utility-block p {
     font-size: 13px;
   }
-  .utility-block .paper-figure {
+  .utility-chart {
     margin: 18px auto;
   }
   .topology-explorer {

@@ -50,7 +50,7 @@
       href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="styles.css?v=939de7b86d" />
+    <link rel="stylesheet" href="styles.css?v=topo-flow1" />
     <script
       src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
       crossorigin="anonymous"
@@ -61,7 +61,7 @@
       crossorigin="anonymous"
       defer
     ></script>
-    <script src="app.js" defer></script>
+    <script src="app.js?v=topo-flow1" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#motivation">Skip to content</a>
@@ -212,12 +212,10 @@
         <figure class="walkthrough-film">
           <video controls playsinline muted preload="none"
             poster="assets/animations/motivation.jpg?v=251c39251d"
-            aria-label="Animation comparing text messages with latent communication"
-            aria-describedby="motivation-caption">
+            aria-label="Animation comparing text messages with latent communication">
             <source src="assets/animations/motivation.mp4?v=af6dd04c83" type="video/mp4" />
             <p><a href="assets/animations/motivation.mp4?v=af6dd04c83">Watch the communication animation</a></p>
           </video>
-          <figcaption id="motivation-caption">State blocks are schematic.</figcaption>
         </figure>
       </section>
 
@@ -718,12 +716,6 @@
             collaboration.
           </p>
         </div>
-        <p class="teaser-caption">
-          <strong>LatentShield</strong> connects local latent collaboration
-          through monitored decision boundaries. The animation illustrates a
-          two-MDU workflow; blue states remain local, and only orange token
-          messages cross between units.
-        </p>
       </section>
 
       <section class="container section" id="method">
@@ -739,22 +731,21 @@
             Llama Guard's representation space. Training adjusts this readout
             while keeping the weights of the agents and Llama Guard fixed.</p>
         </div>
-        <figure class="paper-figure method-figure">
-          <button class="figure-zoom" data-image="assets/method.png"
-            data-caption="LatentShield training and runtime intervention"
-            aria-label="Enlarge method figure">
-            <img src="assets/method.png"
-              alt="Paper figure: trainable learned-query pooling and MLP alignment to frozen Llama Guard, followed by risk-conditioned runtime intervention"
-              loading="lazy" width="1800" height="871" />
-            <span class="zoom-label">↗ Expand figure</span>
-          </button>
-          <figcaption>Training and runtime intervention. Only the attention query and
-            MLP aligner are trained; the backbone and Llama Guard stay fixed.</figcaption>
+        <figure class="walkthrough-film">
+          <video controls playsinline muted preload="none"
+            poster="assets/animations/readout.jpg?v=b5342abedc"
+            aria-label="Team communication through KV caches, collection of the latent trajectory, and learned-query pooling for risk scoring">
+            <source src="assets/animations/readout.mp4?v=b8b919b12b" type="video/mp4" />
+            <p><a href="assets/animations/readout.mp4?v=b8b919b12b">Watch the monitor animation</a></p>
+          </video>
         </figure>
         <div class="reading-copy">
           <h3>From a variable-length trajectory to one score</h3>
-          <p>A learned query assigns a weight to each contributor state and
-            combines the states into one fixed-size vector. During training,
+          <p>During a handoff, the next agent receives context through a
+            key-value (KV) cache. The latent vectors from successive
+            handoffs form the team's latent trajectory. A learned query assigns a
+            weight to each recorded vector and pools them into one fixed-size
+            vector. During training,
             the query learns to give more weight to states that help predict
             harmful compliance. A small two-layer neural network, the MLP
             aligner, maps the pooled vector into the internal representation
@@ -762,17 +753,6 @@
             layer. The remaining frozen layers produce scores for the safe
             and unsafe labels, which we normalize to obtain a risk score.</p>
         </div>
-        <figure class="walkthrough-film">
-          <video controls playsinline muted preload="none"
-            poster="assets/animations/readout.jpg?v=77cb87152e"
-            aria-label="Animation of learned-query pooling, MLP alignment and frozen Llama Guard"
-            aria-describedby="readout-caption">
-            <source src="assets/animations/readout.mp4?v=87d8b73d27" type="video/mp4" />
-            <p><a href="assets/animations/readout.mp4?v=87d8b73d27">Watch the monitor animation</a></p>
-          </video>
-          <figcaption id="readout-caption">State colors and attention weights
-            are illustrative.</figcaption>
-        </figure>
         <div class="reading-copy training-copy">
           <h3>Learn from completed outputs</h3>
           <ol class="training-steps">
@@ -859,10 +839,6 @@
           ></div>
           <div class="result-foot">
             <p id="result-summary" aria-live="polite"></p>
-            <span
-              >Mean \(\pm\) standard deviation across \(3\) training seeds<br />for
-              learned monitors; other baselines evaluated once.</span
-            >
           </div>
           <details class="technical-details">
             <summary>
@@ -877,10 +853,6 @@
             </p>
             <div class="table-scroll">
               <table id="full-results-table">
-                <caption>
-                  Reported mean failure rates. Learned monitor values are mean \(\pm\)
-                  training-seed standard deviation.
-                </caption>
               </table>
             </div>
           </details>
@@ -896,25 +868,16 @@
                 across these tasks, with performance varying by backbone and
                 operating point.</p>
             </div>
-            <figure class="paper-figure">
-              <button
-                class="figure-zoom"
-                data-image="assets/utility.png"
-                data-caption="Benign utility on GPQA-Diamond and MMLU-Pro"
-                aria-label="Enlarge benign utility figure"
-              >
-                <img
-                  src="assets/utility.png"
-                  alt="Paper bar charts comparing benign utility across five backbones and operating points"
-                  loading="lazy"
-                  width="2000"
-                  height="840"
-                /><span class="zoom-label">↗ Expand</span>
-              </button>
-              <figcaption>
-                Benign accuracy from the supplied manuscript. Error bars show
-                variation across training seeds.
-              </figcaption>
+            <figure class="utility-chart" id="utility-chart">
+              <div class="utility-scroll">
+                <svg
+                  id="utility-svg"
+                  viewBox="0 0 1000 412"
+                  role="img"
+                  aria-label="Benign accuracy on GPQA-Diamond and MMLU-Pro for five backbones, comparing text and latent multi-agent systems with LatentShield"
+                ></svg>
+              </div>
+              <div class="utility-legend" id="utility-legend"></div>
             </figure>
           </div>
         </div>
@@ -977,7 +940,6 @@
               <strong>Qwen3-4B · fixed \(p_{10}\)</strong><br />No target-topology
               retraining.<br />No threshold recalibration.
             </p>
-            <small>Means over three independently trained monitors.</small>
           </aside>
         </div>
         <p class="transfer-summary">
@@ -1040,11 +1002,6 @@
                 height="660"
               /><span class="zoom-label">↗ Expand figure</span>
             </button>
-            <figcaption>
-              Different MDU topologies share the same interface: latent
-              collaboration inside, monitored token-space decisions between
-              units.
-            </figcaption>
           </figure>
           <div class="evaluation-summary">
             <h3>Additional evaluations</h3>
@@ -1061,10 +1018,6 @@
             </div>
             <div class="table-scroll">
               <table class="evaluation-table">
-                <caption>
-                  LatentMAS and LatentShield under adaptive attacks, agentic
-                  tasks, and MDU composition.
-                </caption>
                 <thead>
                   <tr>
                     <th scope="col">Evaluation</th>
@@ -1102,10 +1055,6 @@
                 </tbody>
               </table>
             </div>
-            <p class="evaluation-note">
-              LatentShield values are mean \(\pm\) standard deviation across three
-              training seeds. The composed-workflow baseline has no monitor.
-            </p>
           </div>
         </div>
       </section>
@@ -1131,10 +1080,9 @@
         <a href="#top">Back to top ↑</a>
       </p>
     </footer>
-    <dialog id="figure-dialog" aria-labelledby="dialog-caption">
+    <dialog id="figure-dialog" aria-label="Enlarged figure">
       <button id="close-dialog" aria-label="Close enlarged figure">✕</button
       ><img id="dialog-image" alt="" />
-      <p id="dialog-caption"></p>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </body>
